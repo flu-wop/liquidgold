@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useCart } from "@/context/CartContext";
 
 const links = [
   { href: "/shop", label: "Shop" },
@@ -9,6 +12,7 @@ const links = [
 ];
 
 export default function Navbar() {
+  const { count } = useCart();
   return (
     <header className="sticky top-0 z-50 border-b border-cocoa/10 bg-sand/90 backdrop-blur">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
@@ -30,10 +34,10 @@ export default function Navbar() {
           ))}
         </nav>
         <Link
-          href="/shop"
+          href="/cart"
           className="rounded-full bg-cocoa px-5 py-2 font-body text-sm font-semibold text-cream transition-colors hover:bg-guava"
         >
-          Cart (0)
+          Cart ({count})
         </Link>
       </div>
     </header>

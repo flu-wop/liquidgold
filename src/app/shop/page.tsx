@@ -1,7 +1,5 @@
-import { products } from "@/lib/products";
-import ProductCard from "@/components/ProductCard";
-
-const types = ["All", "Body Butter", "Body Oil"];
+import { scents } from "@/lib/scents";
+import ScentShopCard from "@/components/ScentShopCard";
 
 export default function ShopPage() {
   return (
@@ -9,20 +7,12 @@ export default function ShopPage() {
       <h1 className="font-display text-4xl text-cocoa md:text-5xl">
         Shop the <span className="text-gold-gradient italic">Escape</span>
       </h1>
-      {/* PLACEHOLDER: filters are static, not wired to real query/state yet */}
-      <div className="mt-8 flex flex-wrap gap-3">
-        {types.map((t) => (
-          <button
-            key={t}
-            className="rounded-full border border-cocoa/20 px-5 py-2 text-sm text-cocoa/70 hover:border-guava hover:text-guava"
-          >
-            {t}
-          </button>
-        ))}
-      </div>
-      <div className="mt-10 grid grid-cols-2 gap-8 md:grid-cols-4">
-        {products.map((p) => (
-          <ProductCard key={p.handle} product={p} />
+      <p className="mt-3 max-w-md text-cocoa/60">
+        Pick a scent, then choose Body Butter or Body Oil and your size.
+      </p>
+      <div className="mt-10 grid grid-cols-2 gap-x-8 gap-y-12 md:grid-cols-4">
+        {scents.map((s) => (
+          <ScentShopCard key={s.slug} scent={s} />
         ))}
       </div>
     </section>
