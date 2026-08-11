@@ -1,67 +1,96 @@
-// PLACEHOLDER DATA LAYER
-// TODO(commerce): replace with real product/inventory data once Stripe
-// (online) + Square (in-person POS) are wired up and synced. Shape is kept
-// close to what a real product record will look like so swapping the data
-// source later doesn't require rewriting every page that consumes it.
+// LIVE CATALOG — real product structure from Ariel, Aug 11 2026.
+// TODO(commerce): inStock is hardcoded true everywhere until real
+// inventory (Stripe + Square, kept in sync) is wired up.
+
+import { scents } from "./scents";
+
+export type ProductType = "Body Butter" | "Body Oil";
 
 export type Product = {
   handle: string;
   name: string;
-  scent: string; // scent slug, ties to scents.ts
-  type: "Body Butter" | "Body Oil" | "Bundle";
+  scent: string; // scent slug
+  type: ProductType;
+  size: string;
   price: number;
   image: string;
   description: string;
-  inStock: boolean; // always true in the placeholder build
+  ingredients: string[];
+  howToUse: string;
+  featured: boolean;
+  inStock: boolean;
 };
 
-export const products: Product[] = [
-  {
-    handle: "horseshoe-bay-butter",
-    name: "Horseshoe Bay Whipped Butter",
-    scent: "horseshoe-bay",
-    type: "Body Butter",
-    price: 32,
-    image: "/images/placeholder-product.jpg",
-    description:
-      "A pink-sand-inspired whip of shea and coconut butter, scented with guava and warm vanilla.",
-    inStock: true,
-  },
-  {
-    handle: "horseshoe-bay-oil",
-    name: "Horseshoe Bay Dry Oil",
-    scent: "horseshoe-bay",
-    type: "Body Oil",
-    price: 28,
-    image: "/images/placeholder-product.jpg",
-    description:
-      "Fast-absorbing dry oil that layers under or over the whipped butter for a lasting glow.",
-    inStock: true,
-  },
-  {
-    handle: "royal-dockyard-butter",
-    name: "Royal Dockyard Whipped Butter",
-    scent: "royal-dockyard",
-    type: "Body Butter",
-    price: 32,
-    image: "/images/placeholder-product.jpg",
-    description: "Warm amber, sea salt, and fig — deep, sensual, night-out energy.",
-    inStock: true,
-  },
-  {
-    handle: "gold-hill-bundle",
-    name: "Gold Hill Layering Bundle",
-    scent: "gold-hill",
-    type: "Bundle",
-    price: 54,
-    image: "/images/placeholder-product.jpg",
-    description: "Citrus-gold escape, bottled — the oil and butter, together.",
-    inStock: true,
-  },
-];
+const bodyButter = {
+  description:
+    "A rich, nourishing body butter made to deeply moisturize the skin and leave it feeling soft, smooth, and glowing. Made with a blend of moisturizing butters and skin-loving oils.",
+  ingredients: [
+    "Shea Butter",
+    "Cocoa Butter",
+    "Sweet Almond Oil",
+    "Avocado Oil",
+    "Jojoba Oil",
+    "Fragrance Oil (varies by scent)",
+  ],
+  howToUse:
+    "Massage into clean skin as needed, especially after bathing or showering. For an extra glow and longer-lasting moisture, layer with Liquid Gold Body Oil.",
+};
 
-export const getProduct = (handle: string) =>
-  products.find((p) => p.handle === handle);
+const bodyOil = {
+  description:
+    "A lightweight moisturizing body oil designed to soften, nourish, and give the skin a beautiful glow without feeling heavy.",
+  ingredients: ["Sunflower Oil", "Jojoba Oil", "Avocado Oil", "Fragrance Oil (varies by scent)"],
+  howToUse:
+    "Massage into damp or dry skin. For maximum moisture, apply after showering or layer over Liquid Gold Body Butter.",
+};
+
+function slugify(scentSlug: string, type: ProductType, size: string) {
+  const typeSlug = type === "Body Butter" ? "butter" : "oil";
+  return `${scentSlug}-${typeSlug}-${size.replace(" ", "")}`;
+}
+
+export const products: Product[] = scents.flatMap((s) => [
+  {
+    handle: slugify(s.slug, "Body Butter", "8oz"),
+    name: `${s.name} Body Butter — 8 oz`,
+    scent: s.slug,
+    type: "Body Butter" as const,
+    size: "8 oz",
+    price: 25,
+    image: "/images/placeholder-product.jpg",
+    ...bodyButter,
+    featured: s.slug !== "unscented",
+    inStock: true,
+  },
+  {
+    handle: slugify(s.slug, "Body Butter", "4oz"),
+    name: `${s.name} Body Butter — 4 oz`,
+    scent: s.slug,
+    type: "Body Butter" as const,
+    size: "4 oz",
+    price: 15,
+    image: "/images/placeholder-product.jpg",
+    ...bodyButter,
+    featured: false,
+    inStock: true,
+  },
+  {
+    handle: slugify(s.slug, "Body Oil", "8oz"),
+    name: `${s.name} Body Oil — 8 oz`,
+    scent: s.slug,
+    type: "Body Oil" as const,
+    size: "8 oz",
+    price: 32,
+    image: "/images/placeholder-product.jpg",
+    ...bodyOil,
+    featured: false,
+    inStock: true,
+  },
+]);
+
+export const getProduct = (handle: string) => products.find((p) => p.handle === handle);
 
 export const productsByScent = (scentSlug: string) =>
   products.filter((p) => p.scent === scentSlug);
+
+export const featuredProducts = () => products.filter((p) => p.featured);

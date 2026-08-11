@@ -37,10 +37,12 @@ export default function MeetTheScents() {
               >
                 {s.name}
               </p>
-              <p className="mt-4 text-sm uppercase tracking-wide text-cream/60">
-                {s.notes.join("  ·  ")}
-              </p>
               <p className="mt-4 max-w-sm text-cream/70">{s.story}</p>
+              {s.notes.length > 0 && (
+                <p className="mt-3 text-sm uppercase tracking-wide text-cream/50">
+                  {s.notes.slice(0, 4).join("  ·  ")}
+                </p>
+              )}
             </div>
           </Link>
         ))}

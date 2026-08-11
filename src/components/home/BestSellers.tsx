@@ -1,8 +1,9 @@
-import { products } from "@/lib/products";
+import { featuredProducts } from "@/lib/products";
 import ProductCard from "@/components/ProductCard";
 import Button from "@/components/ui/Button";
 
 export default function BestSellers() {
+  const products = featuredProducts();
   return (
     <section className="mx-auto max-w-7xl px-6 py-20">
       <div className="mb-10 flex items-end justify-between">

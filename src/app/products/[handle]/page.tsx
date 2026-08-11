@@ -30,13 +30,23 @@ export default async function ProductPage({
               {scent.name} · {scent.mood}
             </p>
           )}
-          <h1 className="mt-2 font-display text-5xl text-cocoa">{product.name}</h1>
+          <h1 className="mt-2 font-display text-5xl text-cocoa">
+            {product.name.split(" — ")[0]}
+          </h1>
+          <p className="mt-1 text-sm uppercase tracking-wide text-cocoa/50">
+            {product.type} · {product.size}
+          </p>
           <p className="mt-4 font-semibold text-2xl text-cocoa">${product.price}</p>
           <p className="mt-4 text-cocoa/70">{product.description}</p>
 
-          {scent && (
+          {scent && scent.notes.length > 0 && (
             <p className="mt-4 text-sm text-cocoa/60">
               Notes: {scent.notes.join(" · ")}
+            </p>
+          )}
+          {scent && scent.notes.length === 0 && (
+            <p className="mt-4 text-sm italic text-cocoa/40">
+              Fragrance notes coming soon
             </p>
           )}
 
@@ -50,12 +60,15 @@ export default async function ProductPage({
             {product.inStock ? "In stock, ships within 2 business days" : "Back-in-stock alerts coming soon"}
           </Reassurance>
 
-          <div className="mt-10 border-t border-cocoa/10 pt-6 text-sm text-cocoa/70">
-            <p className="font-semibold text-cocoa">How to Use</p>
-            <p className="mt-1">
-              Apply generously after showering while skin is still damp for
-              maximum glow and absorption.
-            </p>
+          <div className="mt-10 space-y-6 border-t border-cocoa/10 pt-6 text-sm text-cocoa/70">
+            <div>
+              <p className="font-semibold text-cocoa">How to Use</p>
+              <p className="mt-1">{product.howToUse}</p>
+            </div>
+            <div>
+              <p className="font-semibold text-cocoa">Ingredients</p>
+              <p className="mt-1">{product.ingredients.join(", ")}</p>
+            </div>
           </div>
         </div>
       </div>
@@ -63,7 +76,7 @@ export default async function ProductPage({
       {pairsWith.length > 0 && (
         <div className="mt-20">
           <h2 className="mb-6 font-display text-2xl text-cocoa">
-            Pairs well <span className="italic text-gold-gradient">with</span>
+            Also in <span className="italic text-gold-gradient">{scent?.name}</span>
           </h2>
           <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
             {pairsWith.map((p) => (

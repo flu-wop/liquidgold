@@ -1,7 +1,7 @@
 import { products } from "@/lib/products";
 import ProductCard from "@/components/ProductCard";
 
-const types = ["All", "Body Butter", "Body Oil", "Bundle"];
+const types = ["All", "Body Butter", "Body Oil"];
 
 export default function ShopPage() {
   return (

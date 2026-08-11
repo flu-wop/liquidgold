@@ -1,45 +1,102 @@
-// PLACEHOLDER DATA LAYER — real content pending final scent lineup + copy
-// from Liquid Gold. Structure supports the "each scent is its own world"
-// destination-page concept from her brief.
+// LIVE COLLECTION — real scent data from Ariel, Aug 11 2026.
+// Only scents marked live below. Future/unreleased concept scents
+// (Satin Heat, Bronze Salt, Dolce Sol) are intentionally excluded per her
+// explicit instruction: "DO NOT DISPLAY ON WEBSITE."
+
+export type Mood = "Sexy" | "Fresh" | "Cozy" | "Tropical" | "Romantic" | "Warm";
 
 export type Scent = {
   slug: string;
   name: string;
-  mood: "Sexy" | "Fresh" | "Cozy" | "Tropical" | "Romantic" | "Warm";
-  accent: string; // hex — each scent layers its own accent on the base palette
-  notes: string[];
-  story: string;
+  personality: string; // her short tag line, e.g. "Warm • Creamy • Cozy • Sensual"
+  mood: Mood; // primary mood bucket, used by the quiz + Shop by Mood
+  vibe: string; // her longer mood description sentence
+  accent: string;
+  notes: string[]; // empty = notes pending, don't render a notes line
+  story: string; // her "short description"
+  availableIn: ("Body Butter" | "Body Oil")[];
   image: string;
 };
 
 export const scents: Scent[] = [
   {
-    slug: "horseshoe-bay",
-    name: "Horseshoe Bay",
+    slug: "cocoa-cashmere",
+    name: "Cocoa Cashmere",
+    personality: "Warm • Creamy • Cozy • Sensual",
+    mood: "Cozy",
+    vibe: "Cozy, sexy, warm, comforting, and addictive.",
+    accent: "#A6763E",
+    notes: [
+      "Light Spices",
+      "Creamy Coconut",
+      "Jasmine",
+      "Vanilla Tonka",
+      "Sandalwood",
+      "Amber",
+      "Cedarwood",
+      "Olive Wood",
+      "Musk",
+      "Cocoa Butter",
+    ],
+    story:
+      "A warm, creamy fragrance that wraps the skin in coconut, soft florals, vanilla-tonka warmth, woods, amber, and musk.",
+    availableIn: ["Body Butter", "Body Oil"],
+    image: "/images/placeholder-scent.jpg",
+  },
+  {
+    slug: "juicy-paradise",
+    name: "Juicy Paradise",
+    personality: "Juicy • Tropical • Sexy • Bright",
     mood: "Tropical",
+    vibe: "Bright sunshine, tropical fruit, warm skin, and vacation energy.",
     accent: "#FF6F52",
-    notes: ["Pink Guava", "Coconut Water", "Warm Vanilla"],
+    notes: ["White Florals", "Peach", "Guava", "Mango", "Papaya"],
     story:
-      "Named for Bermuda's famous pink-sand beach — bright, fruited, and a little sun-warmed.",
+      "A juicy tropical blend overflowing with ripe peach, guava, mango, papaya, and soft white florals.",
+    availableIn: ["Body Butter", "Body Oil"],
     image: "/images/placeholder-scent.jpg",
   },
   {
-    slug: "royal-dockyard",
-    name: "Royal Dockyard",
-    mood: "Sexy",
-    accent: "#D9A441",
-    notes: ["Amber", "Sea Salt", "Fig"],
-    story:
-      "Inspired by the old fortress at dusk — warm, a little smoky, built for the night.",
-    image: "/images/placeholder-scent.jpg",
-  },
-  {
-    slug: "gold-hill",
-    name: "Gold Hill",
+    slug: "bare-current",
+    name: "Bare Current",
+    personality: "Fresh • Clean • Coastal • Unisex",
     mood: "Fresh",
-    accent: "#1B9C93",
-    notes: ["Bergamot", "Citrus Blossom", "Golden Musk"],
-    story: "Morning light through St. George's — citrus-bright and easy.",
+    vibe: "Fresh out of the ocean, sun-warmed skin, clean air, and effortless island energy.",
+    // Deliberately moodier/more muted than the rest of the palette —
+    // per her note: "should be visually more unisex, slightly moodier,
+    // and less feminine than the other scents."
+    accent: "#4F6B66",
+    notes: ["Sea Spray", "Sunstone", "Marine Musk", "Jasmine"],
+    story:
+      "A fresh, skin-like fragrance inspired by warm sun, ocean air, sea spray, soft jasmine, and marine musk.",
+    availableIn: ["Body Butter", "Body Oil"],
+    image: "/images/placeholder-scent.jpg",
+  },
+  {
+    slug: "pink-fantasy",
+    name: "Pink Fantasy",
+    personality: "Flirty • Tropical • Feminine • Bright",
+    mood: "Romantic",
+    vibe: "Pink sunsets, tropical drinks, warm weather, and flirty island energy.",
+    accent: "#F0487A",
+    // TODO(content): final fragrance-note breakdown pending from Ariel
+    // before launch — notes intentionally left empty, not fabricated.
+    notes: [],
+    story:
+      "A playful, tropical fragrance made to feel bright, feminine, fun, and vacation-ready.",
+    availableIn: ["Body Butter", "Body Oil"],
+    image: "/images/placeholder-scent.jpg",
+  },
+  {
+    slug: "unscented",
+    name: "Unscented",
+    personality: "Simple • Natural • Gentle",
+    mood: "Warm",
+    vibe: "For customers who want deep moisture without fragrance.",
+    accent: "#C9A46B",
+    notes: [],
+    story: "No added fragrance. Naturally carries a light cocoa butter aroma.",
+    availableIn: ["Body Butter", "Body Oil"],
     image: "/images/placeholder-scent.jpg",
   },
 ];

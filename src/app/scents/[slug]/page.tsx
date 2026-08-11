@@ -26,15 +26,22 @@ export default async function ScentDestinationPage({
         style={{ background: `linear-gradient(160deg, ${scent.accent}, #1a1a1a)` }}
       >
         <p className="text-xs font-semibold uppercase tracking-[0.3em] text-cream/70">
-          {scent.mood}
+          {scent.personality}
         </p>
         <h1 className="mt-4 font-display text-7xl italic text-cream md:text-9xl">
           {scent.name}
         </h1>
         <p className="mx-auto mt-8 max-w-xl text-lg text-cream/80">{scent.story}</p>
-        <p className="mt-5 text-sm font-medium uppercase tracking-widest text-cream/60">
-          {scent.notes.join("   ·   ")}
-        </p>
+        <p className="mx-auto mt-3 max-w-lg text-sm text-cream/60">{scent.vibe}</p>
+        {scent.notes.length > 0 ? (
+          <p className="mt-5 text-sm font-medium uppercase tracking-widest text-cream/60">
+            {scent.notes.join("   ·   ")}
+          </p>
+        ) : (
+          <p className="mt-5 text-sm italic text-cream/40">
+            Fragrance notes coming soon
+          </p>
+        )}
       </section>
 
       <section className="mx-auto max-w-7xl px-6 py-20">
