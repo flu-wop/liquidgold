@@ -18,29 +18,27 @@ export default async function ScentDestinationPage({
 
   return (
     <>
-      {/* Each scent gets its own accent-layered hero — the "destination"
-          feel from the brief, without breaking the shared base palette. */}
+      {/* Full-viewport campaign hero — each scent is its own world, not a
+          product page. PLACEHOLDER: replace gradient with real campaign
+          photography once available. */}
       <section
-        className="grain px-6 py-24 text-center"
-        style={{ background: `linear-gradient(180deg, ${scent.accent}33, #FBEEDD)` }}
+        className="grain relative flex min-h-[85vh] flex-col items-center justify-center px-6 text-center"
+        style={{ background: `linear-gradient(160deg, ${scent.accent}, #1a1a1a)` }}
       >
-        <p className="text-xs font-semibold uppercase tracking-widest text-cocoa/50">
+        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-cream/70">
           {scent.mood}
         </p>
-        <h1
-          className="mt-3 font-display text-5xl italic md:text-7xl"
-          style={{ color: scent.accent }}
-        >
+        <h1 className="mt-4 font-display text-7xl italic text-cream md:text-9xl">
           {scent.name}
         </h1>
-        <p className="mx-auto mt-6 max-w-xl text-cocoa/70">{scent.story}</p>
-        <p className="mt-4 text-sm font-medium text-cocoa/60">
-          {scent.notes.join(" · ")}
+        <p className="mx-auto mt-8 max-w-xl text-lg text-cream/80">{scent.story}</p>
+        <p className="mt-5 text-sm font-medium uppercase tracking-widest text-cream/60">
+          {scent.notes.join("   ·   ")}
         </p>
       </section>
 
-      <section className="mx-auto max-w-7xl px-6 py-16">
-        <h2 className="mb-6 font-display text-2xl text-cocoa">
+      <section className="mx-auto max-w-7xl px-6 py-20">
+        <h2 className="mb-8 font-display text-3xl text-cocoa">
           Shop this <span className="italic text-gold-gradient">scent</span>
         </h2>
         <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
@@ -50,9 +48,9 @@ export default async function ScentDestinationPage({
         </div>
       </section>
 
-      <section className="bg-cocoa px-6 py-16 text-center text-cream">
-        <p className="font-display text-2xl italic">More islands to explore</p>
-        <div className="mx-auto mt-8 flex max-w-md justify-center gap-4">
+      <section className="bg-cocoa px-6 py-20 text-center text-cream">
+        <p className="font-display text-3xl italic">More islands to explore</p>
+        <div className="mx-auto mt-10 flex max-w-md flex-wrap justify-center gap-4">
           {otherScents.map((s) => (
             <Button key={s.slug} href={`/scents/${s.slug}`} variant="secondary">
               {s.name}

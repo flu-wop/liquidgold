@@ -23,14 +23,14 @@ export default async function ProductPage({
     <section className="mx-auto max-w-7xl px-6 py-16">
       <div className="grid gap-12 md:grid-cols-2">
         {/* PLACEHOLDER: real product photography + texture video go here */}
-        <div className="blob grain aspect-square w-full bg-gradient-to-br from-guava/50 via-gold/50 to-lagoon/50" />
+        <div className="clip-corner grain aspect-[4/5] w-full bg-gradient-to-br from-guava/50 via-gold/50 to-lagoon/50" />
         <div>
           {scent && (
             <p className="text-xs font-semibold uppercase tracking-widest text-guava">
               {scent.name} · {scent.mood}
             </p>
           )}
-          <h1 className="mt-2 font-display text-4xl text-cocoa">{product.name}</h1>
+          <h1 className="mt-2 font-display text-5xl text-cocoa">{product.name}</h1>
           <p className="mt-4 font-semibold text-2xl text-cocoa">${product.price}</p>
           <p className="mt-4 text-cocoa/70">{product.description}</p>
 

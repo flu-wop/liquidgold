@@ -2,31 +2,29 @@ import Link from "next/link";
 import { scents } from "@/lib/scents";
 import type { Mood } from "@/lib/quiz";
 
-const moods: { label: Mood; color: string }[] = [
-  { label: "Sexy", color: "bg-hibiscus" },
-  { label: "Fresh", color: "bg-lagoon" },
-  { label: "Cozy", color: "bg-gold" },
-  { label: "Tropical", color: "bg-guava" },
-  { label: "Romantic", color: "bg-hibiscus" },
-  { label: "Warm", color: "bg-gold" },
-];
+const moods: Mood[] = ["Sexy", "Fresh", "Cozy", "Tropical", "Romantic", "Warm"];
 
 export default function ShopByMood() {
   return (
-    <section className="mx-auto max-w-7xl px-6 py-20">
-      <h2 className="mb-10 font-display text-3xl text-cocoa md:text-4xl">
+    <section className="mx-auto max-w-7xl px-6 py-24">
+      <h2 className="mb-10 font-display text-4xl text-cocoa md:text-5xl">
         Shop by <span className="text-gold-gradient italic">mood</span>
       </h2>
-      <div className="flex flex-wrap gap-4">
+      <div className="flex flex-col divide-y divide-cocoa/10 border-t border-cocoa/10">
         {moods.map((m) => {
-          const scent = scents.find((s) => s.mood === m.label);
+          const scent = scents.find((s) => s.mood === m);
           return (
             <Link
-              key={m.label}
+              key={m}
               href={scent ? `/scents/${scent.slug}` : "/scents"}
-              className={`${m.color} rounded-full px-8 py-4 font-display text-lg italic text-cream transition-transform hover:scale-105`}
+              className="group flex items-center justify-between py-6 transition-colors hover:text-guava"
             >
-              {m.label}
+              <span className="font-display text-4xl italic text-cocoa transition-colors group-hover:text-guava md:text-5xl">
+                {m}
+              </span>
+              <span className="font-body text-sm uppercase tracking-widest text-cocoa/40 transition-transform group-hover:translate-x-1 group-hover:text-guava">
+                {scent?.name ?? "Explore"} &rarr;
+              </span>
             </Link>
           );
         })}

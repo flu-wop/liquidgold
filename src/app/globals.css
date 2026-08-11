@@ -31,6 +31,12 @@ body {
     border-radius: 63% 37% 54% 46% / 55% 48% 52% 45%;
   }
 
+  /* Editorial clipped corner — replaces the blob as the primary image
+     treatment. Sharp, campaign-style, not "cute skincare." */
+  .clip-corner {
+    clip-path: polygon(0 0, 100% 0, 100% 88%, 88% 100%, 0 100%);
+  }
+
   .grain {
     position: relative;
   }
