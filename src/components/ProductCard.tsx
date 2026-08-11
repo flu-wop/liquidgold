@@ -1,10 +1,19 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { Product } from "@/lib/products";
 
 export default function ProductCard({ product }: { product: Product }) {
   return (
     <Link href={`/products/${product.handle}`} className="group block">
-      <div className="clip-corner grain aspect-[3/4] w-full bg-gradient-to-br from-guava/50 via-gold/50 to-lagoon/50 transition-transform duration-300 group-hover:scale-[1.02]" />
+      <div className="clip-corner relative aspect-[3/4] w-full overflow-hidden bg-sand">
+        <Image
+          src={product.image}
+          alt={product.name}
+          fill
+          sizes="(max-width: 768px) 50vw, 25vw"
+          className="object-cover transition-transform duration-300 group-hover:scale-[1.04]"
+        />
+      </div>
       <p className="mt-4 font-display text-xl text-cocoa">
         {product.name.split(" — ")[0]}
       </p>

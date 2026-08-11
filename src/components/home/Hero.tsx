@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Button from "@/components/ui/Button";
 import Reassurance from "@/components/ui/Reassurance";
 
@@ -28,10 +29,17 @@ export default function Hero() {
           </div>
           <Reassurance>Free shipping over $50 · Small-batch, made fresh</Reassurance>
         </div>
-        {/* PLACEHOLDER: swap for real campaign photo/video — glowing skin,
-            product texture, Bermuda water, per her brief. Full-bleed,
-            sharp-edged, not a soft blob. */}
-        <div className="clip-corner grain aspect-[4/5] w-full bg-gradient-to-br from-guava via-gold to-lagoon md:col-span-3 md:aspect-[16/10]" />
+        {/* Real lifestyle photo from her live site */}
+        <div className="clip-corner relative aspect-[4/5] w-full overflow-hidden md:col-span-3 md:aspect-[16/10]">
+          <Image
+            src="/images/products/hero-ritual.jpg"
+            alt="Liquid Gold Skin Co. — island-inspired body care ritual"
+            fill
+            sizes="(max-width: 768px) 100vw, 60vw"
+            className="object-cover"
+            priority
+          />
+        </div>
       </div>
     </section>
   );

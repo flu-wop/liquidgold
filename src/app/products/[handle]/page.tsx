@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Image from "next/image";
 import { getProduct, productsByScent } from "@/lib/products";
 import { getScent } from "@/lib/scents";
 import Button from "@/components/ui/Button";
@@ -22,8 +23,17 @@ export default async function ProductPage({
   return (
     <section className="mx-auto max-w-7xl px-6 py-16">
       <div className="grid gap-12 md:grid-cols-2">
-        {/* PLACEHOLDER: real product photography + texture video go here */}
-        <div className="clip-corner grain aspect-[4/5] w-full bg-gradient-to-br from-guava/50 via-gold/50 to-lagoon/50" />
+        {/* Real product photo from her live Shopify store */}
+        <div className="clip-corner relative aspect-[4/5] w-full overflow-hidden bg-sand">
+          <Image
+            src={product.image}
+            alt={product.name}
+            fill
+            sizes="(max-width: 768px) 100vw, 50vw"
+            className="object-cover"
+            priority
+          />
+        </div>
         <div>
           {scent && (
             <p className="text-xs font-semibold uppercase tracking-widest text-guava">

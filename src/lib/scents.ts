@@ -41,7 +41,7 @@ export const scents: Scent[] = [
     story:
       "A warm, creamy fragrance that wraps the skin in coconut, soft florals, vanilla-tonka warmth, woods, amber, and musk.",
     availableIn: ["Body Butter", "Body Oil"],
-    image: "/images/placeholder-scent.jpg",
+    image: "/images/products/cocoa-cashmere-butter.jpg",
   },
   {
     slug: "juicy-paradise",
@@ -54,7 +54,7 @@ export const scents: Scent[] = [
     story:
       "A juicy tropical blend overflowing with ripe peach, guava, mango, papaya, and soft white florals.",
     availableIn: ["Body Butter", "Body Oil"],
-    image: "/images/placeholder-scent.jpg",
+    image: "/images/products/juicy-paradise.png",
   },
   {
     slug: "bare-current",
@@ -70,7 +70,7 @@ export const scents: Scent[] = [
     story:
       "A fresh, skin-like fragrance inspired by warm sun, ocean air, sea spray, soft jasmine, and marine musk.",
     availableIn: ["Body Butter", "Body Oil"],
-    image: "/images/placeholder-scent.jpg",
+    image: "/images/products/bare-current-oil.jpg",
   },
   {
     slug: "pink-fantasy",
@@ -85,7 +85,7 @@ export const scents: Scent[] = [
     story:
       "A playful, tropical fragrance made to feel bright, feminine, fun, and vacation-ready.",
     availableIn: ["Body Butter", "Body Oil"],
-    image: "/images/placeholder-scent.jpg",
+    image: "/images/products/pink-fantasy.jpg",
   },
   {
     slug: "unscented",
@@ -97,7 +97,7 @@ export const scents: Scent[] = [
     notes: [],
     story: "No added fragrance. Naturally carries a light cocoa butter aroma.",
     availableIn: ["Body Butter", "Body Oil"],
-    image: "/images/placeholder-scent.jpg",
+    image: "/images/products/unscented-butter.jpg",
   },
 ];
 
