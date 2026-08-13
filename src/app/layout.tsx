@@ -3,6 +3,7 @@ import { Fraunces, Manrope } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import PreviewBadge from "@/components/layout/PreviewBadge";
 import { CartProvider } from "@/context/CartContext";
 
 const fraunces = Fraunces({
@@ -35,6 +36,7 @@ export default function RootLayout({
           <main>{children}</main>
           <Footer />
         </CartProvider>
+        <PreviewBadge />
       </body>
     </html>
   );
