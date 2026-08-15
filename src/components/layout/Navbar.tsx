@@ -9,6 +9,7 @@ const links = [
   { href: "/scents", label: "Scents" },
   { href: "/quiz", label: "Find Your Scent" },
   { href: "/about", label: "Our Story" },
+  { href: "/give-back", label: "Give Back" },
   { href: "/wholesale", label: "Wholesale" },
 ];
 

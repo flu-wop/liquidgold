@@ -15,6 +15,16 @@ export default function ContactPage() {
       <h1 className="font-display text-4xl text-cocoa md:text-5xl">
         Get in <span className="text-gold-gradient italic">Touch</span>
       </h1>
+      <p className="mt-3 text-cocoa/60">
+        Prefer email? Reach us directly at{" "}
+        <a
+          href="mailto:liquidgoldskinco@gmail.com"
+          className="text-guava underline underline-offset-2"
+        >
+          liquidgoldskinco@gmail.com
+        </a>
+        .
+      </p>
       {/* PLACEHOLDER: form submit not wired yet — routes to Resend once
           the email/notification layer is built */}
       <form className="mt-10 space-y-4">
