@@ -1,4 +1,4 @@
-import Button from "@/components/ui/Button";
+import WholesaleForm from "./WholesaleForm";
 
 export default function WholesalePage() {
   return (
@@ -25,18 +25,7 @@ export default function WholesalePage() {
         ))}
       </div>
 
-      {/* PLACEHOLDER: form submit not wired yet — routes to Resend once
-          the contact/notification layer is built */}
-      <div className="mt-16 rounded-3xl bg-lagoon/10 p-8">
-        <h2 className="font-display text-2xl text-cocoa">Apply for Wholesale</h2>
-        <form className="mt-6 grid gap-4 md:grid-cols-2">
-          <input placeholder="Business name" className="rounded-xl border border-cocoa/20 bg-cream px-4 py-3 text-sm" />
-          <input placeholder="Email" className="rounded-xl border border-cocoa/20 bg-cream px-4 py-3 text-sm" />
-          <input placeholder="Business type (salon, spa, boutique...)" className="rounded-xl border border-cocoa/20 bg-cream px-4 py-3 text-sm md:col-span-2" />
-          <textarea placeholder="Tell us about your business" rows={4} className="rounded-xl border border-cocoa/20 bg-cream px-4 py-3 text-sm md:col-span-2" />
-          <Button type="submit" className="md:col-span-2 w-fit">Submit Application</Button>
-        </form>
-      </div>
+      <WholesaleForm />
 
       {/* PLACEHOLDER: link to real catalog PDF once she confirms it exists */}
       <p className="mt-8 text-sm text-cocoa/60">
