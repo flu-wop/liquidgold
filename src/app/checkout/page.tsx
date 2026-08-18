@@ -1,10 +1,15 @@
 "use client";
 
-// REAL CHECKOUT — uses Square's Web Payments SDK to tokenize the card
-// entirely client-side. The raw card number never touches our server or
-// hits our network requests — only the resulting single-use token
-// ("sourceId") does. This is a Square requirement, not a style choice:
-// posting raw card data to your own backend is a PCI-compliance violation.
+// REAL CHECKOUT — uses Square's Web Payments SDK to tokenize payment info
+// entirely client-side (card, Apple Pay, Google Pay, Cash App Pay). Raw
+// card numbers never touch our server — only the resulting single-use
+// token ("sourceId") does. This is a Square/PCI requirement, not a style
+// choice. Apple Pay and Google Pay both require the site to be served over
+// real HTTPS on a live domain — neither works on localhost, so they can
+// only be tested on the deployed site, not locally. Apple Pay additionally
+// requires the domain to be registered with Square first (Developer
+// Dashboard → Apple Pay → Add Domain, or the /v2/apple-pay/domains API) —
+// the button silently won't render until that's done.
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -12,16 +17,28 @@ import Image from "next/image";
 import { useCart } from "@/context/CartContext";
 import Button from "@/components/ui/Button";
 
+type SquarePayments = {
+  card: () => Promise<SquareCardMethod>;
+  applePay: (req: SquarePaymentRequest) => Promise<SquareWalletMethod>;
+  googlePay: (req: SquarePaymentRequest) => Promise<SquareWalletMethod>;
+  cashAppPay: (req: SquarePaymentRequest, opts: { redirectURL: string; referenceId: string }) => Promise<SquareWalletMethod>;
+  paymentRequest: (opts: Record<string, unknown>) => SquarePaymentRequest;
+};
+type SquareCardMethod = {
+  attach: (selector: string) => Promise<void>;
+  tokenize: () => Promise<SquareTokenizeResult>;
+};
+type SquareWalletMethod = {
+  attach: (selector: string) => Promise<void>;
+  tokenize: () => Promise<SquareTokenizeResult>;
+  addEventListener?: (event: string, cb: (e: unknown) => void) => void;
+};
+type SquareTokenizeResult = { status: string; token?: string; errors?: { message: string }[] };
+type SquarePaymentRequest = { update: (opts: Record<string, unknown>) => void };
+
 declare global {
   interface Window {
-    Square?: {
-      payments: (appId: string, locationId: string) => Promise<{
-        card: () => Promise<{
-          attach: (selector: string) => Promise<void>;
-          tokenize: () => Promise<{ status: string; token?: string; errors?: { message: string }[] }>;
-        }>;
-      }>;
-    };
+    Square?: { payments: (appId: string, locationId: string) => Promise<SquarePayments> };
   }
 }
 
@@ -32,7 +49,6 @@ const DISPLAY_DISCOUNT_CODES: Record<string, number> = {
   ISLAND15: 15,
   ISLAND20: 20,
 };
-const LA_STATE_TAX_RATE = 0.05;
 
 export default function CheckoutPage() {
   const { items, subtotal, clear } = useCart();
@@ -40,20 +56,23 @@ export default function CheckoutPage() {
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState("");
   const [sdkReady, setSdkReady] = useState(false);
+  const [walletsAvailable, setWalletsAvailable] = useState({ applePay: false, googlePay: false, cashAppPay: false });
   const [discountInput, setDiscountInput] = useState("");
   const [appliedDiscount, setAppliedDiscount] = useState<{ code: string; pct: number } | null>(null);
   const [discountError, setDiscountError] = useState("");
-  // Square's Web Payments SDK is loaded via script tag (no npm types), so
-  // the card instance is typed loosely here rather than fighting a complex
-  // conditional type for something that's inherently `any` at the boundary.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const cardRef = useRef<any>(null);
 
+  const cardRef = useRef<SquareCardMethod | null>(null);
+  const applePayRef = useRef<SquareWalletMethod | null>(null);
+  const googlePayRef = useRef<SquareWalletMethod | null>(null);
+  const cashAppRef = useRef<SquareWalletMethod | null>(null);
+  const paymentRequestRef = useRef<SquarePaymentRequest | null>(null);
+  const contactFormRef = useRef<HTMLFormElement>(null);
+
+  // Display-only estimate — server computes the real total via Square,
+  // which is whatever tax rate Ariel has configured in her Square account.
   const shipping = subtotal >= 50 || subtotal === 0 ? 0 : 6;
   const discountAmount = appliedDiscount ? subtotal * (appliedDiscount.pct / 100) : 0;
-  const taxableAmount = subtotal - discountAmount;
-  const tax = taxableAmount * LA_STATE_TAX_RATE;
-  const total = taxableAmount + tax + shipping;
+  const estimatedTotal = subtotal - discountAmount + shipping;
 
   function handleApplyDiscount() {
     const normalized = discountInput.trim().toUpperCase();
@@ -67,43 +86,164 @@ export default function CheckoutPage() {
     }
   }
 
-  // Load the Square SDK script once, then mount the card field.
+  // Keep the wallet sheets (Apple Pay / Google Pay totals) in sync with
+  // the live estimated total whenever the discount changes. Note: Square's
+  // docs say Cash App Pay does NOT support updating its PaymentRequest —
+  // update() returns false rather than throwing in that case, so this is
+  // safe to call unconditionally, but Cash App Pay's displayed total may
+  // lag behind a discount applied after it's already rendered.
+  useEffect(() => {
+    paymentRequestRef.current?.update({
+      total: { amount: estimatedTotal.toFixed(2), label: "Liquid Gold Skin Co." },
+    });
+  }, [estimatedTotal]);
+
+  // Load the Square SDK once, then mount card + wallet payment methods.
   useEffect(() => {
     if (items.length === 0) return;
 
     const env = process.env.NEXT_PUBLIC_SQUARE_ENVIRONMENT === "production" ? "web" : "sandbox.web";
     const src = `https://${env}.squarecdn.com/v1/square.js`;
 
-    const existing = document.querySelector(`script[src="${src}"]`);
-    async function initCard() {
+    async function initPayments() {
       if (!window.Square) return;
       const appId = process.env.NEXT_PUBLIC_SQUARE_APPLICATION_ID!;
       const locationId = process.env.NEXT_PUBLIC_SQUARE_LOCATION_ID!;
       const payments = await window.Square.payments(appId, locationId);
+
+      // Card — always available
       const card = await payments.card();
       await card.attach("#square-card-container");
       cardRef.current = card;
       setSdkReady(true);
+
+      // Shared payment request object for the wallet methods
+      const paymentRequest = payments.paymentRequest({
+        countryCode: "US",
+        currencyCode: "USD",
+        total: { amount: estimatedTotal.toFixed(2), label: "Liquid Gold Skin Co." },
+      });
+      paymentRequestRef.current = paymentRequest;
+
+      // Each wallet method fails independently if unsupported (e.g. Apple
+      // Pay on non-Safari, or an unregistered domain) — don't let one
+      // wallet failing block the others or the card field.
+      try {
+        const applePay = await payments.applePay(paymentRequest);
+        await applePay.attach("#apple-pay-button");
+        applePayRef.current = applePay;
+        setWalletsAvailable((w) => ({ ...w, applePay: true }));
+      } catch (e) {
+        console.log("Apple Pay unavailable:", e);
+      }
+
+      try {
+        const googlePay = await payments.googlePay(paymentRequest);
+        await googlePay.attach("#google-pay-button");
+        googlePayRef.current = googlePay;
+        setWalletsAvailable((w) => ({ ...w, googlePay: true }));
+      } catch (e) {
+        console.log("Google Pay unavailable:", e);
+      }
+
+      try {
+        const cashAppPay = await payments.cashAppPay(paymentRequest, {
+          redirectURL: `${process.env.NEXT_PUBLIC_SITE_URL}/checkout`,
+          referenceId: `cart-${Date.now()}`,
+        });
+        await cashAppPay.attach("#cash-app-pay-button");
+        cashAppRef.current = cashAppPay;
+        setWalletsAvailable((w) => ({ ...w, cashAppPay: true }));
+      } catch (e) {
+        console.log("Cash App Pay unavailable:", e);
+      }
     }
 
+    const existing = document.querySelector(`script[src="${src}"]`);
     if (existing) {
-      initCard();
+      initPayments();
     } else {
       const script = document.createElement("script");
       script.src = src;
-      script.onload = initCard;
+      script.onload = initPayments;
       document.head.appendChild(script);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items.length]);
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function chargeAndRedirect(sourceId: string) {
+    const form = contactFormRef.current;
+    const email = form?.elements.namedItem("email") as HTMLInputElement | null;
+    const name = form?.elements.namedItem("name") as HTMLInputElement | null;
+    const address = form?.elements.namedItem("address") as HTMLInputElement | null;
+    const city = form?.elements.namedItem("city") as HTMLInputElement | null;
+    const state = form?.elements.namedItem("state") as HTMLInputElement | null;
+    const zip = form?.elements.namedItem("zip") as HTMLInputElement | null;
+
+    if (!email?.value || !name?.value || !address?.value || !city?.value || !state?.value || !zip?.value) {
+      setError("Fill in your contact and shipping details before paying.");
+      return false;
+    }
+
+    const res = await fetch("/api/checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        sourceId,
+        email: email.value,
+        name: name.value,
+        address: address.value,
+        city: city.value,
+        state: state.value,
+        zip: zip.value,
+        items: items.map((i) => ({ handle: i.handle, qty: i.qty })),
+        discountCode: appliedDiscount?.code,
+      }),
+    });
+
+    const data = await res.json();
+    if (!res.ok) {
+      setError(data.error ?? "Something went wrong. Please try again.");
+      return false;
+    }
+
+    clear();
+    const q = new URLSearchParams({
+      order: data.orderId,
+      total: String(data.total),
+      subtotal: String(data.subtotal),
+      discount: String(data.discount),
+      tax: String(data.tax),
+      shipping: String(data.shipping),
+    });
+    router.push(`/checkout/success?${q.toString()}`);
+    return true;
+  }
+
+  async function handleWalletPay(method: SquareWalletMethod | null, label: string) {
+    if (!method) return;
+    setProcessing(true);
+    setError("");
+    try {
+      const result = await method.tokenize();
+      if (result.status !== "OK" || !result.token) {
+        setError(result.errors?.[0]?.message ?? `${label} could not be completed. Try again or use a card.`);
+        setProcessing(false);
+        return;
+      }
+      const ok = await chargeAndRedirect(result.token);
+      if (!ok) setProcessing(false);
+    } catch {
+      setError(`${label} could not be completed. Try again or use a card.`);
+      setProcessing(false);
+    }
+  }
+
+  async function handleCardSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!cardRef.current) return;
     setProcessing(true);
     setError("");
-
-    const form = new FormData(e.currentTarget);
-
     try {
       const tokenResult = await cardRef.current.tokenize();
       if (tokenResult.status !== "OK" || !tokenResult.token) {
@@ -111,32 +251,8 @@ export default function CheckoutPage() {
         setProcessing(false);
         return;
       }
-
-      const res = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          sourceId: tokenResult.token,
-          email: form.get("email"),
-          name: form.get("name"),
-          address: form.get("address"),
-          city: form.get("city"),
-          state: form.get("state"),
-          zip: form.get("zip"),
-          items: items.map((i) => ({ handle: i.handle, qty: i.qty })),
-          discountCode: appliedDiscount?.code,
-        }),
-      });
-
-      const data = await res.json();
-      if (!res.ok) {
-        setError(data.error ?? "Something went wrong. Please try again.");
-        setProcessing(false);
-        return;
-      }
-
-      clear();
-      router.push(`/checkout/success?order=${data.orderId}`);
+      const ok = await chargeAndRedirect(tokenResult.token);
+      if (!ok) setProcessing(false);
     } catch {
       setError("Something went wrong. Please try again.");
       setProcessing(false);
@@ -154,12 +270,14 @@ export default function CheckoutPage() {
     );
   }
 
+  const anyWalletAvailable = walletsAvailable.applePay || walletsAvailable.googlePay || walletsAvailable.cashAppPay;
+
   return (
     <section className="mx-auto max-w-5xl px-6 py-16">
       <h1 className="font-display text-4xl text-cocoa md:text-5xl">Checkout</h1>
 
       <div className="mt-10 grid gap-12 md:grid-cols-2">
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form ref={contactFormRef} onSubmit={handleCardSubmit} className="space-y-4">
           <p className="font-display text-xl text-cocoa">Contact</p>
           <input name="email" required type="email" placeholder="Email" className="w-full rounded-xl border border-cocoa/20 bg-cream px-4 py-3 text-sm" />
 
@@ -172,7 +290,23 @@ export default function CheckoutPage() {
             <input name="zip" required maxLength={20} placeholder="ZIP" className="rounded-xl border border-cocoa/20 bg-cream px-4 py-3 text-sm" />
           </div>
 
-          <p className="pt-4 font-display text-xl text-cocoa">Payment</p>
+          {/* Wallet buttons — Square hides each one automatically if it's
+              not supported/available, so this block can render empty on
+              some browsers/devices. That's expected, not a bug. */}
+          <div className="space-y-2 pt-2">
+            <div id="apple-pay-button" onClick={() => handleWalletPay(applePayRef.current, "Apple Pay")} className="h-11 w-full cursor-pointer overflow-hidden rounded-xl" />
+            <div id="google-pay-button" onClick={() => handleWalletPay(googlePayRef.current, "Google Pay")} className="h-11 w-full cursor-pointer overflow-hidden rounded-xl" />
+            <div id="cash-app-pay-button" onClick={() => handleWalletPay(cashAppRef.current, "Cash App Pay")} className="h-11 w-full cursor-pointer overflow-hidden rounded-xl" />
+          </div>
+          {anyWalletAvailable && (
+            <div className="flex items-center gap-3 text-xs text-cocoa/40">
+              <div className="h-px flex-1 bg-cocoa/10" />
+              or pay with card
+              <div className="h-px flex-1 bg-cocoa/10" />
+            </div>
+          )}
+
+          <p className="pt-2 font-display text-xl text-cocoa">Payment</p>
           {/* Square's SDK renders the actual card fields into this div —
               we never see or handle the raw card number ourselves. */}
           <div id="square-card-container" className="rounded-xl border border-cocoa/20 bg-cream p-4" />
@@ -185,7 +319,7 @@ export default function CheckoutPage() {
             disabled={processing || !sdkReady}
             className="mt-6 w-full rounded-full bg-guava px-7 py-4 font-body text-sm font-semibold text-cream transition-colors hover:bg-hibiscus disabled:opacity-60"
           >
-            {processing ? "Processing…" : `Place Order — $${total.toFixed(2)}`}
+            {processing ? "Processing…" : `Place Order — $${estimatedTotal.toFixed(2)}`}
           </button>
         </form>
 
@@ -245,16 +379,15 @@ export default function CheckoutPage() {
               </div>
             )}
             <div className="flex justify-between text-cocoa/70">
-              <span>Tax (LA state, 5%)</span>
-              <span>${tax.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between text-cocoa/70">
               <span>Shipping</span>
               <span>{shipping === 0 ? "Free" : `$${shipping.toFixed(2)}`}</span>
             </div>
+            <p className="text-xs italic text-cocoa/40">
+              Tax is calculated by Square at payment and shown on the next step.
+            </p>
             <div className="flex justify-between border-t border-cocoa/10 pt-2 font-semibold text-cocoa">
-              <span>Total</span>
-              <span>${total.toFixed(2)}</span>
+              <span>Estimated Total</span>
+              <span>${estimatedTotal.toFixed(2)}</span>
             </div>
           </div>
         </div>
