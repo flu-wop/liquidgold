@@ -17,21 +17,31 @@ const DISCOUNT_CODES: Record<string, number> = {
   ISLAND20: 20,
 };
 
-// Louisiana STATE sales tax only (5%, per LA Dept of Revenue as of 2025) —
-// as an env var, not hardcoded, since even the current published rate is
-// inconsistent across sources as of this build, and destination-based
-// parish/city tax isn't included at all. This is a flat ESTIMATE, not
-// legally accurate compliance — full destination-based tax needs an
-// address-level lookup (Square's Tax API, or a service like
-// Avalara/TaxJar). Flagged for James to confirm with Ariel/an accountant
-// whether state-only is sufficient before this is treated as final. Also
-// worth checking whether she's even crossed LA's $100k remote-seller
-// nexus threshold yet — if not, collection may not be required at all.
-// Set TAX_RATE_LA=0 (or leave unset) to disable entirely.
-const LA_STATE_TAX_RATE = Number(process.env.TAX_RATE_LA ?? "0.05");
-
 function isValidEmail(s: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s) && s.length <= 200;
+}
+
+// ── Tax now lives in Square, not in this codebase. ──
+// Ariel (or James) sets this up once in Square Dashboard → Settings →
+// Business → Sales Tax, and can change the rate anytime with zero code
+// changes or redeploys. We just fetch whatever's currently enabled there
+// and apply it — same rate whether the sale happens online or in person,
+// since it's the same Square account either way. If nothing is configured
+// in Square, no tax is applied (fails safe to $0, not to a guessed rate).
+async function getEnabledSquareTaxIds(): Promise<string[]> {
+  const square = getSquare();
+  const ids: string[] = [];
+  try {
+    const pager = await square.catalog.list({ types: "TAX" });
+    for await (const obj of pager) {
+      if (obj.type === "TAX" && obj.taxData?.enabled) {
+        ids.push(obj.id!);
+      }
+    }
+  } catch (e) {
+    console.error("failed to fetch Square tax settings, proceeding with no tax", e);
+  }
+  return ids;
 }
 
 export async function POST(req: Request) {
@@ -78,9 +88,10 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid cart" }, { status: 400 });
   }
 
-  // ── PRICE LIVES ON THE SERVER — never trust a client-sent amount ──
+  // ── PRICES LIVE ON THE SERVER — never trust a client-sent amount ──
   let subtotalCents = 0;
   const resolvedItems: { name: string; size: string; type: string; qty: number; price: number }[] = [];
+  const lineItems: { uid: string; name: string; quantity: string; basePriceMoney: { amount: bigint; currency: "USD" } }[] = [];
   for (const line of items) {
     if (!line.handle || typeof line.qty !== "number" || line.qty < 1 || line.qty > 20) {
       return NextResponse.json({ error: "Invalid cart line" }, { status: 400 });
@@ -89,7 +100,8 @@ export async function POST(req: Request) {
     if (!product) {
       return NextResponse.json({ error: `Unknown product: ${line.handle}` }, { status: 400 });
     }
-    subtotalCents += Math.round(product.price * 100) * line.qty;
+    const unitCents = Math.round(product.price * 100);
+    subtotalCents += unitCents * line.qty;
     resolvedItems.push({
       name: product.name.split(" — ")[0],
       size: product.size,
@@ -97,38 +109,88 @@ export async function POST(req: Request) {
       qty: line.qty,
       price: product.price,
     });
+    lineItems.push({
+      uid: randomUUID(),
+      name: `${product.name.split(" — ")[0]} (${product.size})`,
+      quantity: String(line.qty),
+      basePriceMoney: { amount: BigInt(unitCents), currency: "USD" },
+    });
   }
   const shippingCents = subtotalCents >= 5000 ? 0 : 600;
 
-  // Discount applies to subtotal only, validated server-side against the
-  // fixed map above — a code the client can't see or forge a percent for.
-  let discountCents = 0;
+  // Discount — server-validated against the fixed map above, applied as a
+  // real Square order-level discount so it shows correctly in her Square
+  // dashboard and reporting, not just in our own records.
   let appliedCode: string | null = null;
+  let discountPct = 0;
   if (discountCode && typeof discountCode === "string") {
     const normalized = discountCode.trim().toUpperCase();
     const pct = DISCOUNT_CODES[normalized];
     if (pct) {
-      discountCents = Math.round(subtotalCents * (pct / 100));
       appliedCode = normalized;
+      discountPct = pct;
     }
   }
 
-  // LA state sales tax on the discounted subtotal — shipping is stated
-  // separately and not taxed (see note above on local/parish tax).
-  const taxableCents = subtotalCents - discountCents;
-  const taxCents = Math.round(taxableCents * LA_STATE_TAX_RATE);
+  const taxIds = await getEnabledSquareTaxIds();
 
-  const totalCents = taxableCents + taxCents + shippingCents;
-
-  // ── Create the Square payment ──
   const orderId = `LG-${randomUUID().slice(0, 8).toUpperCase()}`;
+  const square = getSquare();
+
+  // ── Build the Square Order first — Square computes discount + tax
+  // itself from here, we don't calculate those amounts ourselves. Shipping
+  // is a service charge, not a line item, so it isn't taxed. ──
+  let orderTotalCents: number;
+  let squareOrderId: string;
+  let discountCents = 0;
+  let taxCents = 0;
+  try {
+    const orderResult = await square.orders.create({
+      idempotencyKey: `order-${orderId}`,
+      order: {
+        locationId: process.env.SQUARE_LOCATION_ID!,
+        referenceId: orderId,
+        lineItems,
+        serviceCharges: shippingCents > 0 ? [{
+          uid: randomUUID(),
+          name: "Shipping",
+          amountMoney: { amount: BigInt(shippingCents), currency: "USD" },
+          calculationPhase: "TOTAL_PHASE",
+        }] : undefined,
+        discounts: appliedCode ? [{
+          uid: randomUUID(),
+          name: appliedCode,
+          percentage: String(discountPct),
+          scope: "ORDER",
+        }] : undefined,
+        taxes: taxIds.map((id) => ({
+          uid: randomUUID(),
+          catalogObjectId: id,
+          scope: "ORDER",
+        })),
+      },
+    });
+    const order = orderResult.order;
+    if (!order?.id || order.totalMoney?.amount === undefined) {
+      return NextResponse.json({ error: "Could not calculate order total" }, { status: 500 });
+    }
+    squareOrderId = order.id;
+    orderTotalCents = Number(order.totalMoney.amount);
+    discountCents = Number(order.totalDiscountMoney?.amount ?? 0);
+    taxCents = Number(order.totalTaxMoney?.amount ?? 0);
+  } catch (err) {
+    console.error("Square order creation failed", err);
+    return NextResponse.json({ error: "Could not calculate order total. Please try again." }, { status: 500 });
+  }
+
+  // ── Create the Square payment against that order ──
   let paymentId: string;
   try {
-    const square = getSquare();
     const result = await square.payments.create({
       sourceId,
       idempotencyKey: orderId, // prevents double-charging on retry
-      amountMoney: { amount: BigInt(totalCents), currency: "USD" },
+      orderId: squareOrderId,
+      amountMoney: { amount: BigInt(orderTotalCents), currency: "USD" },
       locationId: process.env.SQUARE_LOCATION_ID!,
       note: `Liquid Gold order ${orderId}`,
       buyerEmailAddress: email,
@@ -154,11 +216,10 @@ export async function POST(req: Request) {
         ON CONFLICT(square_payment_id) DO NOTHING`,
       args: [
         orderId, paymentId, email, name, address, city, state, zip,
-        JSON.stringify(resolvedItems), subtotalCents, appliedCode, discountCents, taxCents, shippingCents, totalCents,
+        JSON.stringify(resolvedItems), subtotalCents, appliedCode, discountCents, taxCents, shippingCents, orderTotalCents,
       ],
     });
     if (inserted.rowsAffected > 0) {
-      // only email on first insert — never fail the order over an email hiccup
       try {
         await sendOrderConfirmation({
           to: email, name, orderId,
@@ -168,7 +229,7 @@ export async function POST(req: Request) {
           discount: discountCents / 100,
           tax: taxCents / 100,
           shipping: shippingCents / 100,
-          total: totalCents / 100,
+          total: orderTotalCents / 100,
         });
       } catch (e) {
         console.error("order confirmation email failed", e);
@@ -176,17 +237,13 @@ export async function POST(req: Request) {
     }
   } catch (err) {
     console.error("order save failed (payment already captured!)", err);
-    // Payment succeeded but the DB write failed — this must not be a
-    // silent console.error nobody sees. Fire a fallback alert through
-    // Resend (a separate system from Turso, so likely still up) with
-    // everything needed to manually reconcile the order.
     try {
       const { getResend } = await import("@/lib/resend");
       await getResend().emails.send({
         from: process.env.RESEND_FROM_EMAIL!,
         to: process.env.RESEND_TO_EMAIL!,
         subject: `⚠️ Order save failed after payment — ${orderId}`,
-        text: `A customer was charged but the order failed to save. Manual reconciliation needed.\n\nSquare Payment ID: ${paymentId}\nOrder ID: ${orderId}\nCustomer: ${name} <${email}>\nAddress: ${address}, ${city}, ${state} ${zip}\nItems: ${JSON.stringify(resolvedItems)}\nSubtotal: $${(subtotalCents / 100).toFixed(2)} | Discount: ${appliedCode ?? "none"} -$${(discountCents / 100).toFixed(2)} | Tax: $${(taxCents / 100).toFixed(2)} | Shipping: $${(shippingCents / 100).toFixed(2)}\nTotal charged: $${(totalCents / 100).toFixed(2)}\n\nError: ${err instanceof Error ? err.message : String(err)}`,
+        text: `A customer was charged but the order failed to save. Manual reconciliation needed.\n\nSquare Payment ID: ${paymentId}\nSquare Order ID: ${squareOrderId}\nOrder ID: ${orderId}\nCustomer: ${name} <${email}>\nAddress: ${address}, ${city}, ${state} ${zip}\nItems: ${JSON.stringify(resolvedItems)}\nSubtotal: $${(subtotalCents / 100).toFixed(2)} | Discount: ${appliedCode ?? "none"} -$${(discountCents / 100).toFixed(2)} | Tax: $${(taxCents / 100).toFixed(2)} | Shipping: $${(shippingCents / 100).toFixed(2)}\nTotal charged: $${(orderTotalCents / 100).toFixed(2)}\n\nError: ${err instanceof Error ? err.message : String(err)}`,
       });
     } catch (alertErr) {
       console.error("fallback alert email also failed", alertErr);
@@ -199,6 +256,6 @@ export async function POST(req: Request) {
     discount: discountCents / 100,
     tax: taxCents / 100,
     shipping: shippingCents / 100,
-    total: totalCents / 100,
+    total: orderTotalCents / 100,
   });
 }
