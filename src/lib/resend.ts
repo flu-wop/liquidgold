@@ -12,18 +12,26 @@ export async function sendOrderConfirmation(opts: {
   name: string;
   orderId: string;
   items: { name: string; size: string; qty: number; price: number }[];
+  subtotal: number;
+  discountCode: string | null;
+  discount: number;
+  tax: number;
+  shipping: number;
   total: number;
 }) {
   const resend = getResend();
   const itemLines = opts.items
     .map((i) => `${i.qty}x ${i.name} (${i.size}) — $${i.price.toFixed(2)}`)
     .join("\n");
+  const discountLine = opts.discount > 0
+    ? `Discount (${opts.discountCode}): -$${opts.discount.toFixed(2)}\n`
+    : "";
   await resend.emails.send({
     from: process.env.RESEND_FROM_EMAIL!,
     to: opts.to,
     bcc: process.env.RESEND_TO_EMAIL,
     subject: `Your Liquid Gold order is confirmed — ${opts.orderId}`,
-    text: `Hi ${opts.name},\n\nYour island escape is on its way.\n\nOrder ${opts.orderId}\n${itemLines}\n\nTotal: $${opts.total.toFixed(2)}\n\n— Liquid Gold Skin Co.`,
+    text: `Hi ${opts.name},\n\nYour island escape is on its way.\n\nOrder ${opts.orderId}\n${itemLines}\n\nSubtotal: $${opts.subtotal.toFixed(2)}\n${discountLine}Tax (LA state): $${opts.tax.toFixed(2)}\nShipping: ${opts.shipping === 0 ? "Free" : "$" + opts.shipping.toFixed(2)}\nTotal: $${opts.total.toFixed(2)}\n\n— Liquid Gold Skin Co.`,
   });
 }
 

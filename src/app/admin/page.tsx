@@ -47,6 +47,12 @@ export default async function AdminPage() {
             </p>
             <p className="text-cocoa/60">{o.name as string} · {o.email as string}</p>
             <p className="text-cocoa/50">{o.address as string}, {o.city as string}, {o.state as string} {o.zip as string}</p>
+            <p className="text-xs text-cocoa/40">
+              Subtotal ${((o.subtotal_cents as number) / 100).toFixed(2)}
+              {o.discount_code ? ` · ${o.discount_code} -$${((o.discount_cents as number) / 100).toFixed(2)}` : ""}
+              {" "}· Tax ${((o.tax_cents as number) / 100).toFixed(2)}
+              {" "}· Shipping ${((o.shipping_cents as number) / 100).toFixed(2)}
+            </p>
           </div>
         ))}
         {orders.rows.length === 0 && <p className="py-4 text-sm text-cocoa/40">No orders yet.</p>}

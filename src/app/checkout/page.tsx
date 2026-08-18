@@ -25,12 +25,24 @@ declare global {
   }
 }
 
+// Client-side mirror of the server's discount map — for live display only.
+// The server re-validates and re-applies the real discount independently;
+// nothing here is trusted for the actual charge.
+const DISPLAY_DISCOUNT_CODES: Record<string, number> = {
+  ISLAND15: 15,
+  ISLAND20: 20,
+};
+const LA_STATE_TAX_RATE = 0.05;
+
 export default function CheckoutPage() {
   const { items, subtotal, clear } = useCart();
   const router = useRouter();
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState("");
   const [sdkReady, setSdkReady] = useState(false);
+  const [discountInput, setDiscountInput] = useState("");
+  const [appliedDiscount, setAppliedDiscount] = useState<{ code: string; pct: number } | null>(null);
+  const [discountError, setDiscountError] = useState("");
   // Square's Web Payments SDK is loaded via script tag (no npm types), so
   // the card instance is typed loosely here rather than fighting a complex
   // conditional type for something that's inherently `any` at the boundary.
@@ -38,7 +50,22 @@ export default function CheckoutPage() {
   const cardRef = useRef<any>(null);
 
   const shipping = subtotal >= 50 || subtotal === 0 ? 0 : 6;
-  const total = subtotal + shipping;
+  const discountAmount = appliedDiscount ? subtotal * (appliedDiscount.pct / 100) : 0;
+  const taxableAmount = subtotal - discountAmount;
+  const tax = taxableAmount * LA_STATE_TAX_RATE;
+  const total = taxableAmount + tax + shipping;
+
+  function handleApplyDiscount() {
+    const normalized = discountInput.trim().toUpperCase();
+    const pct = DISPLAY_DISCOUNT_CODES[normalized];
+    if (pct) {
+      setAppliedDiscount({ code: normalized, pct });
+      setDiscountError("");
+    } else {
+      setAppliedDiscount(null);
+      setDiscountError("Invalid code");
+    }
+  }
 
   // Load the Square SDK script once, then mount the card field.
   useEffect(() => {
@@ -97,6 +124,7 @@ export default function CheckoutPage() {
           state: form.get("state"),
           zip: form.get("zip"),
           items: items.map((i) => ({ handle: i.handle, qty: i.qty })),
+          discountCode: appliedDiscount?.code,
         }),
       });
 
@@ -181,10 +209,44 @@ export default function CheckoutPage() {
               </div>
             ))}
           </div>
-          <div className="mt-6 space-y-2 border-t border-cocoa/10 pt-4 text-sm">
+
+          {/* Discount code — display estimate only; server re-validates */}
+          <div className="mt-6 flex gap-2 border-t border-cocoa/10 pt-4">
+            <input
+              value={discountInput}
+              onChange={(e) => setDiscountInput(e.target.value)}
+              placeholder="Discount code"
+              className="flex-1 rounded-xl border border-cocoa/20 bg-cream px-3 py-2 text-sm"
+            />
+            <button
+              type="button"
+              onClick={handleApplyDiscount}
+              className="rounded-xl border border-cocoa/20 px-4 py-2 text-sm font-semibold text-cocoa hover:border-cocoa"
+            >
+              Apply
+            </button>
+          </div>
+          {discountError && <p className="mt-1 text-xs text-hibiscus">{discountError}</p>}
+          {appliedDiscount && (
+            <p className="mt-1 text-xs text-lagoon-deep">
+              {appliedDiscount.code} applied — {appliedDiscount.pct}% off
+            </p>
+          )}
+
+          <div className="mt-4 space-y-2 border-t border-cocoa/10 pt-4 text-sm">
             <div className="flex justify-between text-cocoa/70">
               <span>Subtotal</span>
               <span>${subtotal.toFixed(2)}</span>
+            </div>
+            {appliedDiscount && (
+              <div className="flex justify-between text-lagoon-deep">
+                <span>Discount ({appliedDiscount.code})</span>
+                <span>-${discountAmount.toFixed(2)}</span>
+              </div>
+            )}
+            <div className="flex justify-between text-cocoa/70">
+              <span>Tax (LA state, 5%)</span>
+              <span>${tax.toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-cocoa/70">
               <span>Shipping</span>

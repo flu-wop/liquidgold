@@ -19,9 +19,6 @@ export default function SuccessClient() {
         Order <span className="font-semibold text-cocoa">{order}</span> is on its
         way to island status. A confirmation email is headed your way.
       </p>
-      <p className="mt-2 text-xs italic text-cocoa/40">
-        (Demo order — no real payment was processed.)
-      </p>
       <div className="mt-10">
         <Button href="/shop">Keep Shopping</Button>
       </div>
