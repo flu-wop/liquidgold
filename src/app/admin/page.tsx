@@ -1,10 +1,12 @@
 import { cookies } from "next/headers";
 import { timingSafeEqual } from "crypto";
+import Link from "next/link";
 import { getDb, ensureSchema } from "@/lib/db";
 import { getStockCounts } from "@/lib/square-catalog";
 import { products } from "@/lib/products";
 import AdminLoginForm from "./AdminLoginForm";
 import CatalogSync from "./CatalogSync";
+import OrdersList from "./OrdersList";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -43,7 +45,12 @@ export default async function AdminPage() {
 
   return (
     <section className="mx-auto max-w-5xl px-6 py-16">
-      <h1 className="font-display text-4xl text-cocoa">Admin</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="font-display text-4xl text-cocoa">Admin</h1>
+        <Link href="/admin/system" className="text-sm font-semibold text-guava hover:underline">
+          System Health &rarr;
+        </Link>
+      </div>
 
       <h2 className="mt-12 mb-4 font-display text-2xl text-cocoa">Product Catalog</h2>
       <CatalogSync stock={stock} />
@@ -51,24 +58,7 @@ export default async function AdminPage() {
       <h2 className="mt-12 mb-4 font-display text-2xl text-cocoa">
         Orders ({orders.rows.length})
       </h2>
-      <div className="divide-y divide-cocoa/10 border-t border-cocoa/10">
-        {orders.rows.map((o) => (
-          <div key={o.id as string} className="py-4 text-sm">
-            <p className="font-semibold text-cocoa">
-              {o.id as string} — ${((o.total_cents as number) / 100).toFixed(2)} — {o.status as string}
-            </p>
-            <p className="text-cocoa/60">{o.name as string} · {o.email as string}</p>
-            <p className="text-cocoa/50">{o.address as string}, {o.city as string}, {o.state as string} {o.zip as string}</p>
-            <p className="text-xs text-cocoa/40">
-              Subtotal ${((o.subtotal_cents as number) / 100).toFixed(2)}
-              {o.discount_code ? ` · ${o.discount_code} -$${((o.discount_cents as number) / 100).toFixed(2)}` : ""}
-              {" "}· Tax ${((o.tax_cents as number) / 100).toFixed(2)}
-              {" "}· Shipping ${((o.shipping_cents as number) / 100).toFixed(2)}
-            </p>
-          </div>
-        ))}
-        {orders.rows.length === 0 && <p className="py-4 text-sm text-cocoa/40">No orders yet.</p>}
-      </div>
+      <OrdersList orders={orders.rows as never} />
 
       <h2 className="mt-12 mb-4 font-display text-2xl text-cocoa">
         Wholesale Inquiries ({wholesale.rows.length})

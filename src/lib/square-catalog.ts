@@ -171,3 +171,31 @@ export async function getStockCounts(): Promise<Record<string, number | null>> {
   }
   return stock;
 }
+
+// ── Set a physical stock count for one SKU ──
+// Used by the admin "set stock" UI so Ariel can manage inventory from our
+// own dashboard instead of needing a separate trip to Square Dashboard.
+export async function setStockCount(handle: string, quantity: number): Promise<void> {
+  const variationId = await getCatalogVariationId(handle);
+  if (!variationId) {
+    throw new Error(`"${handle}" hasn't been synced to Square Catalog yet — sync first.`);
+  }
+  const square = getSquare();
+  await square.inventory.batchCreateChanges({
+    idempotencyKey: randomUUID(),
+    changes: [
+      {
+        type: "PHYSICAL_COUNT",
+        physicalCount: {
+          referenceId: randomUUID(),
+          catalogObjectId: variationId,
+          state: "IN_STOCK",
+          locationId: process.env.SQUARE_LOCATION_ID!,
+          quantity: String(quantity),
+          occurredAt: new Date().toISOString(),
+        },
+      },
+    ],
+    ignoreUnchangedCounts: true,
+  });
+}

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { rateLimit, clientIp } from "@/lib/rate-limit";
 import { cookies } from "next/headers";
 import { timingSafeEqual } from "crypto";
-import { syncCatalog } from "@/lib/square-catalog";
+import { setStockCount } from "@/lib/square-catalog";
 
 export const runtime = "nodejs";
 
@@ -23,14 +23,17 @@ export async function POST(req: Request) {
   if (!(await isAuthed())) {
     return NextResponse.json({ error: "Not authorized" }, { status: 401 });
   }
-  const allowed = await rateLimit(`sync-catalog:${clientIp(req)}`, 5, 300); // 5 per 5 min
-  if (!allowed) return NextResponse.json({ error: "Too many sync requests — wait a few minutes." }, { status: 429 });
+  const allowed = await rateLimit(`set-stock:${clientIp(req)}`, 30, 60);
+  if (!allowed) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+  const { handle, quantity } = await req.json().catch(() => ({}));
+  if (!handle || typeof quantity !== "number" || quantity < 0 || quantity > 100000) {
+    return NextResponse.json({ error: "Invalid handle or quantity" }, { status: 400 });
+  }
   try {
-    const result = await syncCatalog();
-    return NextResponse.json({ ok: true, ...result });
+    await setStockCount(handle, Math.floor(quantity));
+    return NextResponse.json({ ok: true });
   } catch (err) {
-    console.error("catalog sync failed", err);
     const message = err instanceof Error ? err.message : "Unknown error";
-    return NextResponse.json({ error: `Sync failed: ${message}` }, { status: 500 });
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

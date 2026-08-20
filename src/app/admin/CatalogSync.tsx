@@ -5,6 +5,62 @@ import { useRouter } from "next/navigation";
 
 type Stock = { handle: string; name: string; count: number | null };
 
+function StockRow({ item }: { item: Stock }) {
+  const [value, setValue] = useState(item.count?.toString() ?? "");
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [error, setError] = useState("");
+  const router = useRouter();
+
+  async function handleSave() {
+    const quantity = Number(value);
+    if (Number.isNaN(quantity) || quantity < 0) return;
+    setSaving(true);
+    setError("");
+    const res = await fetch("/api/admin/set-stock", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ handle: item.handle, quantity }),
+    });
+    setSaving(false);
+    if (res.ok) {
+      setSaved(true);
+      setTimeout(() => setSaved(false), 1500);
+      router.refresh();
+    } else {
+      const data = await res.json().catch(() => ({}));
+      setError(data.error ?? "Failed to save — try again.");
+    }
+  }
+
+  return (
+    <div className="rounded-lg bg-lagoon/10 px-3 py-2 text-xs">
+      <p className="font-medium text-cocoa">{item.name}</p>
+      {item.count === null ? (
+        <p className="text-cocoa/50">Not synced</p>
+      ) : (
+        <div className="mt-1 flex items-center gap-1">
+          <input
+            type="number"
+            min={0}
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            className="w-16 rounded border border-cocoa/20 bg-cream px-1.5 py-0.5 text-xs"
+          />
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="rounded bg-cocoa px-2 py-0.5 text-xs font-semibold text-cream disabled:opacity-50"
+          >
+            {saving ? "…" : saved ? "\u2713" : "Set"}
+          </button>
+        </div>
+      )}
+      {error && <p className="mt-1 text-hibiscus">{error}</p>}
+    </div>
+  );
+}
+
 export default function CatalogSync({ stock }: { stock: Stock[] }) {
   const [syncing, setSyncing] = useState(false);
   const [result, setResult] = useState<string | null>(null);
@@ -45,19 +101,13 @@ export default function CatalogSync({ stock }: { stock: Stock[] }) {
 
       {unsynced.length > 0 && (
         <p className="mt-2 text-xs italic text-cocoa/40">
-          Not yet synced: run a sync above. After syncing, set real starting quantities
-          in Square Dashboard → Items (we don&apos;t invent stock numbers).
+          Not yet synced: run a sync above, then set quantities below.
         </p>
       )}
 
       <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
         {stock.map((s) => (
-          <div key={s.handle} className="rounded-lg bg-lagoon/10 px-3 py-2 text-xs">
-            <p className="font-medium text-cocoa">{s.name}</p>
-            <p className={s.count === 0 ? "text-hibiscus" : "text-cocoa/50"}>
-              {s.count === null ? "Not synced" : s.count === 0 ? "Sold out" : `${s.count} in stock`}
-            </p>
-          </div>
+          <StockRow key={s.handle} item={s} />
         ))}
       </div>
     </div>

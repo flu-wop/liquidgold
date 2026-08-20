@@ -35,9 +35,21 @@ export async function ensureSchema() {
       shipping_cents INTEGER NOT NULL,
       total_cents INTEGER NOT NULL,
       status TEXT NOT NULL DEFAULT 'paid',
+      tracking_number TEXT,
+      tracking_carrier TEXT,
+      shipped_at INTEGER,
       created_at INTEGER NOT NULL DEFAULT (unixepoch())
     )
   `);
+  // Orders tables created before tracking columns existed — add if missing
+  // rather than requiring a manual migration.
+  for (const col of ["tracking_number TEXT", "tracking_carrier TEXT", "shipped_at INTEGER"]) {
+    try {
+      await db.execute(`ALTER TABLE orders ADD COLUMN ${col}`);
+    } catch {
+      // column already exists — fine
+    }
+  }
   await db.execute(`
     CREATE TABLE IF NOT EXISTS wholesale_inquiries (
       id TEXT PRIMARY KEY,
@@ -71,4 +83,20 @@ export async function ensureSchema() {
       synced_at INTEGER NOT NULL DEFAULT (unixepoch())
     )
   `);
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS api_calls (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      provider TEXT NOT NULL,
+      created_at INTEGER NOT NULL DEFAULT (unixepoch())
+    )
+  `);
+}
+
+// Fire-and-forget usage counter for the admin health dashboard. Never
+// awaited by callers on the critical path — a logging failure must not
+// block or slow down an actual email/API call.
+export function logApiCall(provider: string) {
+  ensureSchema()
+    .then(() => getDb().execute({ sql: `INSERT INTO api_calls (provider) VALUES (?)`, args: [provider] }))
+    .catch((e) => console.error("api_calls logging failed", e));
 }
