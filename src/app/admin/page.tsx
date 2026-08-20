@@ -47,9 +47,14 @@ export default async function AdminPage() {
     <section className="mx-auto max-w-5xl px-6 py-16">
       <div className="flex items-center justify-between">
         <h1 className="font-display text-4xl text-cocoa">Admin</h1>
-        <Link href="/admin/system" className="text-sm font-semibold text-guava hover:underline">
-          System Health &rarr;
-        </Link>
+        <div className="flex gap-4">
+          <Link href="/admin/content" className="text-sm font-semibold text-guava hover:underline">
+            Edit Content &rarr;
+          </Link>
+          <Link href="/admin/system" className="text-sm font-semibold text-guava hover:underline">
+            System Health &rarr;
+          </Link>
+        </div>
       </div>
 
       <h2 className="mt-12 mb-4 font-display text-2xl text-cocoa">Product Catalog</h2>

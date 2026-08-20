@@ -1,6 +1,14 @@
 import Image from "next/image";
+import { getContentMap, content } from "@/lib/content";
 
-export default function AboutPage() {
+export const dynamic = "force-dynamic";
+
+export default async function AboutPage() {
+  const contentMap = await getContentMap();
+  const story = content(contentMap, "about.story").split("\n").filter(Boolean);
+  const mission = content(contentMap, "about.mission").split("\n").filter(Boolean);
+  const founderImage = content(contentMap, "about.founderImage");
+
   return (
     <section className="mx-auto max-w-3xl px-6 py-20">
       <h1 className="font-display text-4xl text-cocoa md:text-5xl">
@@ -11,47 +19,14 @@ export default function AboutPage() {
       </p>
 
       <div className="mt-8 space-y-6 text-lg leading-relaxed text-cocoa/70">
-        <p>I&rsquo;m Ariel Salgado &mdash; founder of Liquid Gold Skin Co.</p>
-        <p>
-          This brand is more than skin deep to me. It&rsquo;s family deep.
-          It&rsquo;s a story of growth, resilience, and learning how to love
-          myself, one small habit at a time.
-        </p>
-        <p>
-          Being surrounded by the incredibly strong women in my family set my
-          mind on success &amp; what it could look like, but the way I
-          measured success was a bit different. I paved my own path, was on
-          the ground running at 18. Corporate lifestyle was never for me. I
-          knew I had to be my own boss. Creating discipline and healthy
-          habits for myself didn&rsquo;t come easy. I lost my mother before
-          the age of 20 &mdash; she was a great pillar of success in my life.
-          Losing my mother young felt like a setback, and I no longer knew
-          what it meant to take care of myself. I was not living, I was
-          surviving.
-        </p>
-        <p>
-          And through that survival, you grow. I didn&rsquo;t know what was
-          right or wrong, but I knew one thing: I love to learn. I dove into
-          research, experimented with natural ingredients, and slowly began
-          creating products for myself.
-        </p>
-        <p>
-          My skin journey began in 2019 &mdash; this has become my life and
-          my passion. Over the years, I continued to make transitions out of
-          consumerism that is detrimental to our skin and ultimately our
-          health. This is my way of transforming an idea taught to us that we
-          know to question but are confused how to into something beautiful
-          and intentional.
-        </p>
-        <p>
-          Thank you for being here and for joining me on this journey. Your
-          glow is waiting.
-        </p>
+        {story.map((paragraph, i) => (
+          <p key={i}>{paragraph}</p>
+        ))}
       </div>
 
       <div className="mt-10 overflow-hidden rounded-3xl">
         <Image
-          src="/images/brand/founder-ariel.jpg"
+          src={founderImage}
           alt="Ariel Salgado, founder of Liquid Gold Skin Co."
           width={1021}
           height={1080}
@@ -67,19 +42,9 @@ export default function AboutPage() {
           Affordable. Clean. Beauty.
         </p>
         <div className="mt-6 space-y-6 text-lg leading-relaxed text-cocoa/70">
-          <p>
-            At Liquid Gold Skin Co., we believe self care isn&rsquo;t just a
-            luxury &mdash; it&rsquo;s a necessity. Every product is made with
-            love and intention, turning your daily skincare into a ritual of
-            self love and a reminder to let go of the harsh chemicals and
-            preservatives. Preserve yourself inside and out.
-          </p>
-          <p>
-            This is a journey that we are on together &mdash; letting go of
-            the unnatural and making the effort to enjoy taking care of our
-            body and skin more than ever. It is a war against the unnatural,
-            and together we are going to win!
-          </p>
+          {mission.map((paragraph, i) => (
+            <p key={i}>{paragraph}</p>
+          ))}
           <p className="font-display italic text-cocoa">Yours truly, Ariel</p>
         </div>
       </div>

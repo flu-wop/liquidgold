@@ -90,6 +90,13 @@ export async function ensureSchema() {
       created_at INTEGER NOT NULL DEFAULT (unixepoch())
     )
   `);
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS content (
+      key TEXT PRIMARY KEY,
+      value TEXT NOT NULL,
+      updated_at INTEGER NOT NULL DEFAULT (unixepoch())
+    )
+  `);
 }
 
 // Fire-and-forget usage counter for the admin health dashboard. Never

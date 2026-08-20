@@ -4,6 +4,9 @@ import { getScent, scents } from "@/lib/scents";
 import { productsByScent } from "@/lib/products";
 import ProductCard from "@/components/ProductCard";
 import Button from "@/components/ui/Button";
+import { getContentMap, getScentContent } from "@/lib/content";
+
+export const dynamic = "force-dynamic";
 
 export default async function ScentDestinationPage({
   params,
@@ -16,6 +19,8 @@ export default async function ScentDestinationPage({
 
   const scentProducts = productsByScent(scent.slug);
   const otherScents = scents.filter((s) => s.slug !== scent.slug);
+  const contentMap = await getContentMap();
+  const display = getScentContent(contentMap, scent.slug);
 
   return (
     <>
@@ -23,7 +28,7 @@ export default async function ScentDestinationPage({
           with a dark scrim for text legibility. */}
       <section className="relative flex min-h-[85vh] flex-col items-center justify-center px-6 text-center">
         <Image
-          src={scent.image}
+          src={display.image}
           alt={scent.name}
           fill
           sizes="100vw"
@@ -43,8 +48,8 @@ export default async function ScentDestinationPage({
           <h1 className="mt-4 font-display text-7xl italic text-cream md:text-9xl">
             {scent.name}
           </h1>
-          <p className="mx-auto mt-8 max-w-xl text-lg text-cream/90">{scent.story}</p>
-          <p className="mx-auto mt-3 max-w-lg text-sm text-cream/70">{scent.vibe}</p>
+          <p className="mx-auto mt-8 max-w-xl text-lg text-cream/90">{display.story}</p>
+          <p className="mx-auto mt-3 max-w-lg text-sm text-cream/70">{display.vibe}</p>
           {scent.notes.length > 0 ? (
             <p className="mt-5 text-sm font-medium uppercase tracking-widest text-cream/70">
               {scent.notes.join("   ·   ")}
