@@ -5,6 +5,7 @@ import { getDb, ensureSchema } from "@/lib/db";
 import { rateLimit, clientIp } from "@/lib/rate-limit";
 import { getProduct } from "@/lib/products";
 import { sendOrderConfirmation } from "@/lib/resend";
+import { getAllCatalogVariationIds, getStockCounts } from "@/lib/square-catalog";
 
 export const runtime = "nodejs";
 
@@ -89,9 +90,24 @@ export async function POST(req: Request) {
   }
 
   // ── PRICES LIVE ON THE SERVER — never trust a client-sent amount ──
+  // Line items reference the synced Square Catalog variation when one
+  // exists, so Square auto-decrements real inventory on payment — but we
+  // ALSO set basePriceMoney explicitly so our own price stays authoritative
+  // even if someone edits the price in Square's dashboard later. Falls
+  // back to a plain ad-hoc line item for any product that hasn't been
+  // synced yet, so checkout never breaks on a missing catalog mapping.
+  const catalogIds = await getAllCatalogVariationIds();
+  const stockCounts = await getStockCounts();
+
   let subtotalCents = 0;
   const resolvedItems: { name: string; size: string; type: string; qty: number; price: number }[] = [];
-  const lineItems: { uid: string; name: string; quantity: string; basePriceMoney: { amount: bigint; currency: "USD" } }[] = [];
+  const lineItems: {
+    uid: string;
+    catalogObjectId?: string;
+    name?: string;
+    quantity: string;
+    basePriceMoney: { amount: bigint; currency: "USD" };
+  }[] = [];
   for (const line of items) {
     if (!line.handle || typeof line.qty !== "number" || line.qty < 1 || line.qty > 20) {
       return NextResponse.json({ error: "Invalid cart line" }, { status: 400 });
@@ -100,6 +116,18 @@ export async function POST(req: Request) {
     if (!product) {
       return NextResponse.json({ error: `Unknown product: ${line.handle}` }, { status: 400 });
     }
+
+    // Stock check — only enforced once a product is actually synced/tracked
+    // in Square. A null count means "not synced yet", which we don't want
+    // to treat as sold out.
+    const available = stockCounts[line.handle];
+    if (available !== null && available !== undefined && available < line.qty) {
+      return NextResponse.json(
+        { error: `Only ${available} of ${product.name.split(" — ")[0]} (${product.size}) left in stock.` },
+        { status: 409 }
+      );
+    }
+
     const unitCents = Math.round(product.price * 100);
     subtotalCents += unitCents * line.qty;
     resolvedItems.push({
@@ -109,12 +137,23 @@ export async function POST(req: Request) {
       qty: line.qty,
       price: product.price,
     });
-    lineItems.push({
-      uid: randomUUID(),
-      name: `${product.name.split(" — ")[0]} (${product.size})`,
-      quantity: String(line.qty),
-      basePriceMoney: { amount: BigInt(unitCents), currency: "USD" },
-    });
+
+    const catalogObjectId = catalogIds[line.handle];
+    lineItems.push(
+      catalogObjectId
+        ? {
+            uid: randomUUID(),
+            catalogObjectId,
+            quantity: String(line.qty),
+            basePriceMoney: { amount: BigInt(unitCents), currency: "USD" },
+          }
+        : {
+            uid: randomUUID(),
+            name: `${product.name.split(" — ")[0]} (${product.size})`,
+            quantity: String(line.qty),
+            basePriceMoney: { amount: BigInt(unitCents), currency: "USD" },
+          }
+    );
   }
   const shippingCents = subtotalCents >= 5000 ? 0 : 600;
 

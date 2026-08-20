@@ -7,7 +7,9 @@ import { productsByScent, type ProductType } from "@/lib/products";
 import type { Scent } from "@/lib/scents";
 import { useCart } from "@/context/CartContext";
 
-export default function ScentShopCard({ scent }: { scent: Scent }) {
+type Stock = Record<string, number | null>;
+
+export default function ScentShopCard({ scent, stock = {} }: { scent: Scent; stock?: Stock }) {
   const variants = productsByScent(scent.slug);
   const types = Array.from(new Set(variants.map((v) => v.type))) as ProductType[];
   const [type, setType] = useState<ProductType>(types[0]);
@@ -16,6 +18,10 @@ export default function ScentShopCard({ scent }: { scent: Scent }) {
 
   const active =
     variants.find((v) => v.type === type && v.size === size) ?? variants[0];
+  // null = not synced to Square yet, treat as available. 0 = actually sold out.
+  const activeStock = stock[active.handle];
+  const soldOut = activeStock === 0;
+
   const { addItem } = useCart();
   const [justAdded, setJustAdded] = useState(false);
 
@@ -26,6 +32,7 @@ export default function ScentShopCard({ scent }: { scent: Scent }) {
   }
 
   function handleAdd() {
+    if (soldOut) return;
     addItem(active, 1);
     setJustAdded(true);
     setTimeout(() => setJustAdded(false), 1500);
@@ -40,8 +47,13 @@ export default function ScentShopCard({ scent }: { scent: Scent }) {
             alt={active.name}
             fill
             sizes="(max-width: 768px) 50vw, 25vw"
-            className="object-cover transition-transform duration-300 group-hover:scale-[1.04]"
+            className={`object-cover transition-transform duration-300 group-hover:scale-[1.04] ${soldOut ? "opacity-40 grayscale" : ""}`}
           />
+          {soldOut && (
+            <span className="absolute left-2 top-2 rounded-full bg-cocoa px-3 py-1 text-xs font-semibold text-cream">
+              Sold Out
+            </span>
+          )}
         </div>
       </Link>
       <p className="mt-4 font-display text-xl text-cocoa">{scent.name}</p>
@@ -85,9 +97,10 @@ export default function ScentShopCard({ scent }: { scent: Scent }) {
         <p className="font-semibold text-guava">${active.price}</p>
         <button
           onClick={handleAdd}
-          className="rounded-full bg-cocoa px-4 py-1.5 text-xs font-semibold text-cream transition-colors hover:bg-guava"
+          disabled={soldOut}
+          className="rounded-full bg-cocoa px-4 py-1.5 text-xs font-semibold text-cream transition-colors hover:bg-guava disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-cocoa"
         >
-          {justAdded ? "Added ✓" : "Add to Cart"}
+          {soldOut ? "Sold Out" : justAdded ? "Added ✓" : "Add to Cart"}
         </button>
       </div>
     </div>

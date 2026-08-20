@@ -63,4 +63,12 @@ export async function ensureSchema() {
       k TEXT, w INTEGER, c INTEGER, PRIMARY KEY (k, w)
     )
   `);
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS square_catalog_map (
+      handle TEXT PRIMARY KEY,
+      item_id TEXT NOT NULL,
+      variation_id TEXT NOT NULL,
+      synced_at INTEGER NOT NULL DEFAULT (unixepoch())
+    )
+  `);
 }

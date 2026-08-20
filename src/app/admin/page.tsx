@@ -1,7 +1,10 @@
 import { cookies } from "next/headers";
 import { timingSafeEqual } from "crypto";
 import { getDb, ensureSchema } from "@/lib/db";
+import { getStockCounts } from "@/lib/square-catalog";
+import { products } from "@/lib/products";
 import AdminLoginForm from "./AdminLoginForm";
+import CatalogSync from "./CatalogSync";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -26,15 +29,24 @@ export default async function AdminPage() {
 
   await ensureSchema();
   const db = getDb();
-  const [orders, wholesale, contacts] = await Promise.all([
+  const [orders, wholesale, contacts, stockCounts] = await Promise.all([
     db.execute(`SELECT * FROM orders ORDER BY created_at DESC LIMIT 50`),
     db.execute(`SELECT * FROM wholesale_inquiries ORDER BY created_at DESC LIMIT 50`),
     db.execute(`SELECT * FROM contact_messages ORDER BY created_at DESC LIMIT 50`),
+    getStockCounts(),
   ]);
+  const stock = products.map((p) => ({
+    handle: p.handle,
+    name: `${p.name.split(" — ")[0]} (${p.size})`,
+    count: stockCounts[p.handle] ?? null,
+  }));
 
   return (
     <section className="mx-auto max-w-5xl px-6 py-16">
       <h1 className="font-display text-4xl text-cocoa">Admin</h1>
+
+      <h2 className="mt-12 mb-4 font-display text-2xl text-cocoa">Product Catalog</h2>
+      <CatalogSync stock={stock} />
 
       <h2 className="mt-12 mb-4 font-display text-2xl text-cocoa">
         Orders ({orders.rows.length})
