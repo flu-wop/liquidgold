@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { timingSafeEqual } from "crypto";
+import Link from "next/link";
 import AdminLoginForm from "../AdminLoginForm";
 import SystemDashboard from "./SystemDashboard";
 
@@ -24,7 +25,10 @@ export default async function SystemPage() {
 
   return (
     <section className="mx-auto max-w-5xl px-6 py-16">
-      <h1 className="font-display text-4xl text-cocoa">System Health</h1>
+      <Link href="/admin" className="text-sm font-semibold text-guava hover:underline">
+        &larr; Back to Admin
+      </Link>
+      <h1 className="mt-4 font-display text-4xl text-cocoa">System Health</h1>
       <div className="mt-8">
         <SystemDashboard />
       </div>

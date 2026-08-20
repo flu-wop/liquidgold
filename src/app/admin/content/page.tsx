@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { timingSafeEqual } from "crypto";
+import Link from "next/link";
 import AdminLoginForm from "../AdminLoginForm";
 import ContentEditor from "./ContentEditor";
 import { CONTENT_FIELDS, getContentMap, content, type ContentKey } from "@/lib/content";
@@ -31,7 +32,10 @@ export default async function ContentPage() {
 
   return (
     <section className="mx-auto max-w-5xl px-6 py-16">
-      <h1 className="font-display text-4xl text-cocoa">Edit Site Content</h1>
+      <Link href="/admin" className="text-sm font-semibold text-guava hover:underline">
+        &larr; Back to Admin
+      </Link>
+      <h1 className="mt-4 font-display text-4xl text-cocoa">Edit Site Content</h1>
       <p className="mt-2 text-sm text-cocoa/60">
         Change wording and photos here — nothing here can break the site's layout or checkout.
       </p>
