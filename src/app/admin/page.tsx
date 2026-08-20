@@ -7,6 +7,7 @@ import { products } from "@/lib/products";
 import AdminLoginForm from "./AdminLoginForm";
 import CatalogSync from "./CatalogSync";
 import OrdersList from "./OrdersList";
+import Accordion from "./Accordion";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -45,51 +46,66 @@ export default async function AdminPage() {
 
   return (
     <section className="mx-auto max-w-5xl px-6 py-16">
-      <div className="flex items-center justify-between">
-        <h1 className="font-display text-4xl text-cocoa">Admin</h1>
-        <div className="flex gap-4">
-          <Link href="/admin/content" className="text-sm font-semibold text-guava hover:underline">
-            Edit Content &rarr;
-          </Link>
-          <Link href="/admin/system" className="text-sm font-semibold text-guava hover:underline">
-            System Health &rarr;
-          </Link>
-        </div>
+      <h1 className="font-display text-4xl text-cocoa">Admin</h1>
+
+      {/* Prominent nav buttons instead of small corner links */}
+      <div className="mt-6 grid gap-4 sm:grid-cols-2">
+        <Link
+          href="/admin/content"
+          className="rounded-2xl bg-guava px-6 py-6 text-center font-display text-xl text-cream transition-colors hover:bg-hibiscus"
+        >
+          Edit Site Content
+          <span className="mt-1 block font-body text-sm font-normal text-cream/80">
+            Wording &amp; photos
+          </span>
+        </Link>
+        <Link
+          href="/admin/system"
+          className="rounded-2xl bg-cocoa px-6 py-6 text-center font-display text-xl text-cream transition-colors hover:bg-lagoon-deep"
+        >
+          System Health
+          <span className="mt-1 block font-body text-sm font-normal text-cream/70">
+            Is everything connected?
+          </span>
+        </Link>
       </div>
 
-      <h2 className="mt-12 mb-4 font-display text-2xl text-cocoa">Product Catalog</h2>
-      <CatalogSync stock={stock} />
+      {/* Everything below collapses so a busy admin page stays scannable
+          as order volume grows — Orders opens by default since it's what
+          gets checked most. */}
+      <div className="mt-10">
+        <Accordion title="Product Catalog">
+          <CatalogSync stock={stock} />
+        </Accordion>
 
-      <h2 className="mt-12 mb-4 font-display text-2xl text-cocoa">
-        Orders ({orders.rows.length})
-      </h2>
-      <OrdersList orders={orders.rows as never} />
+        <Accordion title="Orders" count={orders.rows.length} defaultOpen>
+          <OrdersList orders={orders.rows as never} />
+        </Accordion>
 
-      <h2 className="mt-12 mb-4 font-display text-2xl text-cocoa">
-        Wholesale Inquiries ({wholesale.rows.length})
-      </h2>
-      <div className="divide-y divide-cocoa/10 border-t border-cocoa/10">
-        {wholesale.rows.map((w) => (
-          <div key={w.id as string} className="py-4 text-sm">
-            <p className="font-semibold text-cocoa">{w.business_name as string} · {w.email as string}</p>
-            <p className="text-cocoa/60">{w.business_type as string}</p>
-            <p className="text-cocoa/50">{w.message as string}</p>
+        <Accordion title="Wholesale Inquiries" count={wholesale.rows.length}>
+          <div className="divide-y divide-cocoa/10 border-t border-cocoa/10">
+            {wholesale.rows.map((w) => (
+              <div key={w.id as string} className="py-4 text-sm">
+                <p className="font-semibold text-cocoa">{w.business_name as string} · {w.email as string}</p>
+                <p className="text-cocoa/60">{w.business_type as string}</p>
+                <p className="text-cocoa/50">{w.message as string}</p>
+              </div>
+            ))}
+            {wholesale.rows.length === 0 && <p className="py-4 text-sm text-cocoa/40">None yet.</p>}
           </div>
-        ))}
-        {wholesale.rows.length === 0 && <p className="py-4 text-sm text-cocoa/40">None yet.</p>}
-      </div>
+        </Accordion>
 
-      <h2 className="mt-12 mb-4 font-display text-2xl text-cocoa">
-        Contact Messages ({contacts.rows.length})
-      </h2>
-      <div className="divide-y divide-cocoa/10 border-t border-cocoa/10">
-        {contacts.rows.map((c) => (
-          <div key={c.id as string} className="py-4 text-sm">
-            <p className="font-semibold text-cocoa">[{c.reason as string}] {c.name as string} · {c.email as string}</p>
-            <p className="text-cocoa/50">{c.message as string}</p>
+        <Accordion title="Contact Messages" count={contacts.rows.length}>
+          <div className="divide-y divide-cocoa/10 border-t border-cocoa/10">
+            {contacts.rows.map((c) => (
+              <div key={c.id as string} className="py-4 text-sm">
+                <p className="font-semibold text-cocoa">[{c.reason as string}] {c.name as string} · {c.email as string}</p>
+                <p className="text-cocoa/50">{c.message as string}</p>
+              </div>
+            ))}
+            {contacts.rows.length === 0 && <p className="py-4 text-sm text-cocoa/40">None yet.</p>}
           </div>
-        ))}
-        {contacts.rows.length === 0 && <p className="py-4 text-sm text-cocoa/40">None yet.</p>}
+        </Accordion>
       </div>
     </section>
   );

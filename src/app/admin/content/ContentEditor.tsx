@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { CONTENT_FIELDS, type ContentKey } from "@/lib/content";
+import Accordion from "../Accordion";
 
 type Props = { values: Record<ContentKey, string> };
 
@@ -110,10 +111,9 @@ function ImageField({ fieldKey, initial }: { fieldKey: ContentKey; initial: stri
   );
 }
 
-function Section({ title, keys, values }: { title: string; keys: ContentKey[]; values: Record<ContentKey, string> }) {
+function Section({ title, keys, values, defaultOpen }: { title: string; keys: ContentKey[]; values: Record<ContentKey, string>; defaultOpen?: boolean }) {
   return (
-    <div className="mt-8">
-      <h2 className="mb-4 font-display text-2xl text-cocoa">{title}</h2>
+    <Accordion title={title} defaultOpen={defaultOpen}>
       <div className="grid gap-4 sm:grid-cols-2">
         {keys.map((k) =>
           CONTENT_FIELDS[k].type === "image" ? (
@@ -123,7 +123,7 @@ function Section({ title, keys, values }: { title: string; keys: ContentKey[]; v
           )
         )}
       </div>
-    </div>
+    </Accordion>
   );
 }
 
@@ -131,7 +131,7 @@ export default function ContentEditor({ values }: Props) {
   const scentSlugs = ["cocoa-cashmere", "juicy-paradise", "bare-current", "pink-fantasy", "unscented"];
   return (
     <div>
-      <Section title="Homepage" keys={["hero.headline", "hero.subheadline", "hero.image"]} values={values} />
+      <Section title="Homepage" keys={["hero.headline", "hero.subheadline", "hero.image"]} values={values} defaultOpen />
       <Section title="About Page" keys={["about.story", "about.founderImage", "about.mission"]} values={values} />
       {scentSlugs.map((slug) => (
         <Section
