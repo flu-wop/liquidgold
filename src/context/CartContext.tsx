@@ -7,6 +7,7 @@
 
 import { createContext, useContext, useEffect, useState, useMemo } from "react";
 import type { Product } from "@/lib/products";
+import { trackAddToCart } from "@/lib/analytics";
 
 export type CartItem = {
   handle: string;
@@ -58,6 +59,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, [items, hydrated]);
 
   function addItem(product: Product, qty = 1) {
+    trackAddToCart({
+      handle: product.handle,
+      name: product.name.split(" — ")[0],
+      price: product.price,
+      qty,
+    });
     setItems((prev) => {
       const existing = prev.find((i) => i.handle === product.handle);
       if (existing) {

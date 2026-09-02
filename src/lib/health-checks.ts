@@ -32,6 +32,23 @@ export function checkEnvVars(): Record<string, CheckResult> {
   return results;
 }
 
+// Optional — site works fine without these, they just mean the
+// corresponding pixel never loads. "warn" not "error" when missing.
+const OPTIONAL_ANALYTICS_ENV_VARS = [
+  "NEXT_PUBLIC_GA_MEASUREMENT_ID",
+  "NEXT_PUBLIC_META_PIXEL_ID",
+  "NEXT_PUBLIC_TIKTOK_PIXEL_ID",
+];
+
+export function checkAnalyticsEnvVars(): Record<string, CheckResult> {
+  const results: Record<string, CheckResult> = {};
+  for (const key of OPTIONAL_ANALYTICS_ENV_VARS) {
+    const present = !!process.env[key];
+    results[key] = { status: present ? "ok" : "warn", detail: present ? "set" : "not set — pixel won't load" };
+  }
+  return results;
+}
+
 // ---- 2. Webhook / Connection Health ----
 export async function checkSquare(): Promise<CheckResult> {
   try {

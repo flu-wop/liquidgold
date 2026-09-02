@@ -49,7 +49,7 @@ export default async function AdminPage() {
       <h1 className="font-display text-4xl text-cocoa">Admin</h1>
 
       {/* Prominent nav buttons instead of small corner links */}
-      <div className="mt-6 grid gap-4 sm:grid-cols-2">
+      <div className="mt-6 grid gap-4 sm:grid-cols-3">
         <Link
           href="/admin/content"
           className="rounded-2xl bg-guava px-6 py-6 text-center font-display text-xl text-cream transition-colors hover:bg-hibiscus"
@@ -57,6 +57,15 @@ export default async function AdminPage() {
           Edit Site Content
           <span className="mt-1 block font-body text-sm font-normal text-cream/80">
             Wording &amp; photos
+          </span>
+        </Link>
+        <Link
+          href="/admin/funnel"
+          className="rounded-2xl bg-lagoon-deep px-6 py-6 text-center font-display text-xl text-cream transition-colors hover:bg-lagoon"
+        >
+          Funnel &amp; Conversion
+          <span className="mt-1 block font-body text-sm font-normal text-cream/80">
+            Where customers drop off
           </span>
         </Link>
         <Link

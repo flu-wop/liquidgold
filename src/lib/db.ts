@@ -97,6 +97,23 @@ export async function ensureSchema() {
       updated_at INTEGER NOT NULL DEFAULT (unixepoch())
     )
   `);
+  // Funnel/behavioral events — separate from `orders` (which only records
+  // completed purchases). Session-scoped (not user-identified), used to
+  // reconstruct drop-off between quiz start and checkout, and to detect
+  // abandoned checkouts (checkout_started with no matching order).
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS funnel_events (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      session_id TEXT NOT NULL,
+      event_type TEXT NOT NULL,
+      data_json TEXT,
+      created_at INTEGER NOT NULL DEFAULT (unixepoch())
+    )
+  `);
+  await db.execute(`
+    CREATE INDEX IF NOT EXISTS idx_funnel_events_type_time
+    ON funnel_events (event_type, created_at)
+  `);
 }
 
 // Fire-and-forget usage counter for the admin health dashboard. Never

@@ -16,6 +16,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useCart } from "@/context/CartContext";
 import Button from "@/components/ui/Button";
+import { trackBeginCheckout, trackPurchase } from "@/lib/analytics";
 
 type SquarePayments = {
   card: () => Promise<SquareCardMethod>;
@@ -97,6 +98,20 @@ export default function CheckoutPage() {
       total: { amount: estimatedTotal.toFixed(2), label: "Liquid Gold Skin Co." },
     });
   }, [estimatedTotal]);
+
+  // Fire once per checkout landing, on the cart contents as they existed
+  // when the page loaded (not on every discount/quantity tweak after —
+  // this is what abandoned-checkout detection matches against below).
+  const beginCheckoutFired = useRef(false);
+  useEffect(() => {
+    if (items.length === 0 || beginCheckoutFired.current) return;
+    beginCheckoutFired.current = true;
+    trackBeginCheckout(
+      items.map((i) => ({ handle: i.handle, name: i.name, price: i.price, qty: i.qty })),
+      subtotal
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [items.length]);
 
   // Load the Square SDK once, then mount card + wallet payment methods.
   useEffect(() => {
@@ -207,6 +222,14 @@ export default function CheckoutPage() {
       return false;
     }
 
+    // Fire before clear() while item data is still in scope. This also
+    // logs the "purchase" funnel event to Turso, which is what marks a
+    // matching checkout_started row as completed (not abandoned).
+    trackPurchase(
+      data.orderId,
+      items.map((i) => ({ handle: i.handle, name: i.name, price: i.price, qty: i.qty })),
+      data.total
+    );
     clear();
     const q = new URLSearchParams({
       order: data.orderId,

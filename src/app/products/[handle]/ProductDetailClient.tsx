@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { productsByScent, type Product, type ProductType } from "@/lib/products";
 import type { Scent } from "@/lib/scents";
 import { useCart } from "@/context/CartContext";
 import Button from "@/components/ui/Button";
 import Reassurance from "@/components/ui/Reassurance";
+import { trackViewItem } from "@/lib/analytics";
 
 export default function ProductDetailClient({
   initial,
@@ -26,6 +27,17 @@ export default function ProductDetailClient({
 
   const { addItem } = useCart();
   const [added, setAdded] = useState(false);
+
+  // Fire once per page landing, using the product actually landed on —
+  // not every variant toggle, which would inflate view_item counts.
+  useEffect(() => {
+    trackViewItem({
+      handle: initial.handle,
+      name: initial.name.split(" — ")[0],
+      price: initial.price,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initial.handle]);
 
   function handleTypeChange(t: ProductType) {
     setType(t);

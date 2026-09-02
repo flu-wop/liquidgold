@@ -8,6 +8,7 @@ type HealthData = {
   webhookHealth: { square: CheckResult; squareWebhook: CheckResult; lastOrder: CheckResult; resend: CheckResult; turso: CheckResult };
   apiUsage: CheckResult;
   productSync: CheckResult;
+  analyticsEnvVars: Record<string, CheckResult>;
   checkedAt: string;
 };
 
@@ -82,6 +83,14 @@ export default function SystemDashboard() {
 
         <Card title="Product Sync">
           <div className="text-sm text-cocoa/80"><Pill status={data.productSync.status} /> {data.productSync.detail}</div>
+        </Card>
+
+        <Card title="Analytics Pixels">
+          {Object.entries(data.analyticsEnvVars).map(([key, r]) => (
+            <div key={key} className="mb-1.5 text-sm text-cocoa/80">
+              <Pill status={r.status} /> {key} — {r.detail}
+            </div>
+          ))}
         </Card>
       </div>
     </div>

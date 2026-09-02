@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { timingSafeEqual } from "crypto";
 import {
   checkEnvVars, checkSquare, checkSquareWebhook, checkLastOrder,
-  checkResend, checkTurso, checkApiUsage, checkProductSync,
+  checkResend, checkTurso, checkApiUsage, checkProductSync, checkAnalyticsEnvVars,
 } from "@/lib/health-checks";
 
 export const runtime = "nodejs";
@@ -29,7 +29,7 @@ export async function GET(req: Request) {
   const allowed = await rateLimit(`health:${clientIp(req)}`, 20, 60);
   if (!allowed) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
 
-  const [envVars, square, squareWebhook, lastOrder, resend, turso, apiUsage, productSync] = await Promise.all([
+  const [envVars, square, squareWebhook, lastOrder, resend, turso, apiUsage, productSync, analyticsEnvVars] = await Promise.all([
     Promise.resolve(checkEnvVars()),
     checkSquare(),
     checkSquareWebhook(),
@@ -38,6 +38,7 @@ export async function GET(req: Request) {
     checkTurso(),
     checkApiUsage(),
     checkProductSync(),
+    Promise.resolve(checkAnalyticsEnvVars()),
   ]);
 
   return NextResponse.json({
@@ -45,6 +46,7 @@ export async function GET(req: Request) {
     webhookHealth: { square, squareWebhook, lastOrder, resend, turso },
     apiUsage,
     productSync,
+    analyticsEnvVars,
     checkedAt: new Date().toISOString(),
   });
 }

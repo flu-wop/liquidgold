@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { quizQuestions, scoreQuiz, type Mood } from "@/lib/quiz";
 import Button from "@/components/ui/Button";
+import { trackQuizStarted, trackQuizCompleted } from "@/lib/analytics";
 
 export default function QuizClient() {
   const router = useRouter();
@@ -12,6 +13,13 @@ export default function QuizClient() {
 
   const question = quizQuestions[step];
 
+  const startFired = useRef(false);
+  useEffect(() => {
+    if (startFired.current) return;
+    startFired.current = true;
+    trackQuizStarted();
+  }, []);
+
   function handleAnswer(mood: Mood) {
     const next = [...answers, mood];
     if (step + 1 < quizQuestions.length) {
@@ -19,6 +27,7 @@ export default function QuizClient() {
       setStep(step + 1);
     } else {
       const result = scoreQuiz(next);
+      trackQuizCompleted(result.slug);
       router.push(`/quiz/results?scent=${result.slug}`);
     }
   }
