@@ -1,24 +1,9 @@
-import { cookies } from "next/headers";
-import { timingSafeEqual } from "crypto";
-import Link from "next/link";
+import { isAuthed } from "@/lib/admin-auth";
 import AdminLoginForm from "../AdminLoginForm";
 import { getFunnelCounts, getAbandonedCheckouts } from "@/lib/funnel";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-
-function safeEq(a: string, b: string) {
-  const A = Buffer.from(a), B = Buffer.from(b);
-  return A.length === B.length && timingSafeEqual(A, B);
-}
-
-async function isAuthed() {
-  const store = await cookies();
-  const cookie = store.get("lg_admin")?.value;
-  const expected = process.env.ADMIN_PASSWORD;
-  if (!cookie || !expected) return false;
-  return safeEq(cookie, expected);
-}
 
 function pct(part: number, whole: number): string {
   if (whole === 0) return "—";
@@ -50,10 +35,7 @@ export default async function FunnelPage() {
 
   return (
     <section className="mx-auto max-w-5xl px-6 py-16">
-      <Link href="/admin" className="text-sm font-semibold text-guava hover:underline">
-        &larr; Back to Admin
-      </Link>
-      <h1 className="mt-4 font-display text-4xl text-cocoa">Funnel &amp; Conversion</h1>
+      <h1 className="font-display text-4xl text-cocoa">Funnel &amp; Conversion</h1>
       <p className="mt-2 text-sm text-cocoa/60">
         Last 30 days, counted by unique visitor session (not raw page views). Requires
         GA_MEASUREMENT_ID / META_PIXEL_ID / TIKTOK_PIXEL_ID to be set for the platform-side

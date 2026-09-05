@@ -1,9 +1,7 @@
-import { cookies } from "next/headers";
-import { timingSafeEqual } from "crypto";
-import Link from "next/link";
 import { getDb, ensureSchema } from "@/lib/db";
 import { getStockCounts } from "@/lib/square-catalog";
 import { products } from "@/lib/products";
+import { isAuthed } from "@/lib/admin-auth";
 import AdminLoginForm from "./AdminLoginForm";
 import CatalogSync from "./CatalogSync";
 import OrdersList from "./OrdersList";
@@ -11,19 +9,6 @@ import Accordion from "./Accordion";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-
-function safeEq(a: string, b: string) {
-  const A = Buffer.from(a), B = Buffer.from(b);
-  return A.length === B.length && timingSafeEqual(A, B);
-}
-
-async function isAuthed() {
-  const store = await cookies();
-  const cookie = store.get("lg_admin")?.value;
-  const expected = process.env.ADMIN_PASSWORD;
-  if (!cookie || !expected) return false;
-  return safeEq(cookie, expected);
-}
 
 export default async function AdminPage() {
   if (!(await isAuthed())) {
@@ -48,40 +33,6 @@ export default async function AdminPage() {
     <section className="mx-auto max-w-5xl px-6 py-16">
       <h1 className="font-display text-4xl text-cocoa">Admin</h1>
 
-      {/* Prominent nav buttons instead of small corner links */}
-      <div className="mt-6 grid gap-4 sm:grid-cols-3">
-        <Link
-          href="/admin/content"
-          className="rounded-2xl bg-guava px-6 py-6 text-center font-display text-xl text-cream transition-colors hover:bg-hibiscus"
-        >
-          Edit Site Content
-          <span className="mt-1 block font-body text-sm font-normal text-cream/80">
-            Wording &amp; photos
-          </span>
-        </Link>
-        <Link
-          href="/admin/funnel"
-          className="rounded-2xl bg-lagoon-deep px-6 py-6 text-center font-display text-xl text-cream transition-colors hover:bg-lagoon"
-        >
-          Funnel &amp; Conversion
-          <span className="mt-1 block font-body text-sm font-normal text-cream/80">
-            Where customers drop off
-          </span>
-        </Link>
-        <Link
-          href="/admin/system"
-          className="rounded-2xl bg-cocoa px-6 py-6 text-center font-display text-xl text-cream transition-colors hover:bg-lagoon-deep"
-        >
-          System Health
-          <span className="mt-1 block font-body text-sm font-normal text-cream/70">
-            Is everything connected?
-          </span>
-        </Link>
-      </div>
-
-      {/* Everything below collapses so a busy admin page stays scannable
-          as order volume grows — Orders opens by default since it's what
-          gets checked most. */}
       <div className="mt-10">
         <Accordion title="Product Catalog">
           <CatalogSync stock={stock} />
