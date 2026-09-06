@@ -30,7 +30,7 @@ export default function Reviews() {
           ))}
         </div>
         <p className="mt-8 text-xs text-cocoa/50">
-          Customer reviews coming soon — this section is wired for Judge.me/Okendo once installed.
+          Customer reviews coming soon.
         </p>
       </div>
     </section>

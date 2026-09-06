@@ -58,10 +58,6 @@ export default function Footer() {
         >
           IN-FLU-ENTIAL LLC
         </a>
-        {" "}&middot;{" "}
-        <Link href="/admin" className="text-cream/30 hover:text-cream/60">
-          Admin
-        </Link>
       </p>
     </footer>
   );
