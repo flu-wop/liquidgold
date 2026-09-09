@@ -1,15 +1,20 @@
 import Link from "next/link";
 import Image from "next/image";
 import { scents } from "@/lib/scents";
+import { getHiddenScentSlugs } from "@/lib/scent-visibility";
 
-export default function ScentsIndexPage() {
+export const dynamic = "force-dynamic";
+
+export default async function ScentsIndexPage() {
+  const hiddenSlugs = await getHiddenScentSlugs();
+  const visibleScents = scents.filter((s) => !hiddenSlugs.has(s.slug));
   return (
     <section className="mx-auto max-w-7xl px-6 py-16">
       <h1 className="font-display text-4xl text-cocoa md:text-5xl">
         Choose your <span className="text-gold-gradient italic">island escape</span>
       </h1>
       <div className="mt-10 grid gap-8 md:grid-cols-3">
-        {scents.map((s) => (
+        {visibleScents.map((s) => (
           <Link
             key={s.slug}
             href={`/scents/${s.slug}`}

@@ -13,12 +13,16 @@ export default function ProductDetailClient({
   initial,
   scent,
   descriptions,
+  isCustom = false,
 }: {
   initial: Product;
   scent: Scent | undefined;
   descriptions: { bodyButter: string; bodyOil: string };
+  isCustom?: boolean;
 }) {
-  const variants = productsByScent(initial.scent);
+  // Custom (admin-added) products aren't in the static catalog, so they
+  // have no known variants to switch between — just show the one SKU as-is.
+  const variants = isCustom ? [initial] : productsByScent(initial.scent);
   const types = Array.from(new Set(variants.map((v) => v.type))) as ProductType[];
   const [type, setType] = useState<ProductType>(initial.type);
   const [size, setSize] = useState(initial.size);
@@ -29,7 +33,10 @@ export default function ProductDetailClient({
   // `variants` comes from the static catalog, so its .description is always
   // the hardcoded default — override with the admin-edited copy here so
   // switching Body Butter <-> Body Oil mid-page still reflects /admin/content.
-  const activeDescription = active.type === "Body Butter" ? descriptions.bodyButter : descriptions.bodyOil;
+  // Custom products carry their own real, per-product description instead.
+  const activeDescription = isCustom
+    ? active.description
+    : active.type === "Body Butter" ? descriptions.bodyButter : descriptions.bodyOil;
 
   const { addItem } = useCart();
   const [added, setAdded] = useState(false);

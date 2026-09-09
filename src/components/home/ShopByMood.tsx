@@ -4,7 +4,7 @@ import type { Mood } from "@/lib/quiz";
 
 const moods: Mood[] = ["Sexy", "Fresh", "Cozy", "Tropical", "Romantic", "Warm"];
 
-export default function ShopByMood() {
+export default function ShopByMood({ hiddenSlugs }: { hiddenSlugs: Set<string> }) {
   return (
     <section className="mx-auto max-w-7xl px-6 py-24">
       <h2 className="mb-10 font-display text-4xl text-cocoa md:text-5xl">
@@ -12,7 +12,7 @@ export default function ShopByMood() {
       </h2>
       <div className="flex flex-col divide-y divide-cocoa/10 border-t border-cocoa/10">
         {moods.map((m) => {
-          const scent = scents.find((s) => s.mood === m);
+          const scent = scents.find((s) => s.mood === m && !hiddenSlugs.has(s.slug));
           return (
             <Link
               key={m}

@@ -114,6 +114,31 @@ export async function ensureSchema() {
     CREATE INDEX IF NOT EXISTS idx_funnel_events_type_time
     ON funnel_events (event_type, created_at)
   `);
+  // Admin-added products — separate from the 15 hardcoded SKUs in
+  // products.ts, which stay code-defined since they're battle-tested and
+  // already Square-synced. New products Ariel adds through /admin live
+  // here instead, and get merged with the static list at read time
+  // (see lib/catalog.ts). `active = 0` is the "removed" state — soft
+  // delete, same philosophy as scent-visibility, nothing is ever lost.
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS custom_products (
+      handle TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      scent_slug TEXT NOT NULL,
+      scent_name TEXT NOT NULL,
+      type TEXT NOT NULL,
+      size TEXT NOT NULL,
+      price REAL NOT NULL,
+      image TEXT NOT NULL,
+      description TEXT NOT NULL,
+      ingredients_json TEXT NOT NULL,
+      how_to_use TEXT NOT NULL,
+      featured INTEGER NOT NULL DEFAULT 0,
+      active INTEGER NOT NULL DEFAULT 1,
+      created_at INTEGER NOT NULL DEFAULT (unixepoch()),
+      updated_at INTEGER NOT NULL DEFAULT (unixepoch())
+    )
+  `);
 }
 
 // Fire-and-forget usage counter for the admin health dashboard. Never

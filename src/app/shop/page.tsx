@@ -1,7 +1,9 @@
 import { scents } from "@/lib/scents";
 import ScentShopCard from "@/components/ScentShopCard";
+import ProductCard from "@/components/ProductCard";
 import { getStockCounts } from "@/lib/square-catalog";
 import { getHiddenScentSlugs } from "@/lib/scent-visibility";
+import { getCustomProducts } from "@/lib/custom-products";
 
 // Stock counts must be fetched fresh on every request, not baked in at
 // build time — otherwise every visitor would see whatever stock existed
@@ -18,8 +20,12 @@ export default async function ShopPage() {
   } catch (e) {
     console.error("stock count fetch failed, shop page proceeding without it", e);
   }
-  const hidden = await getHiddenScentSlugs();
+  const [hidden, customProducts] = await Promise.all([
+    getHiddenScentSlugs(),
+    getCustomProducts({ includeInactive: false }),
+  ]);
   const visibleScents = scents.filter((s) => !hidden.has(s.slug));
+
   return (
     <section className="mx-auto max-w-7xl px-6 py-16">
       <h1 className="font-display text-4xl text-cocoa md:text-5xl">
@@ -33,6 +39,20 @@ export default async function ShopPage() {
           <ScentShopCard key={s.slug} scent={s} stock={stock} />
         ))}
       </div>
+
+      {/* Admin-added products — shown as plain cards rather than the
+          scent-grouped card above, since they don't have the editorial
+          mood/notes/accent data the 5 hero scents do. */}
+      {customProducts.length > 0 && (
+        <div className="mt-20">
+          <h2 className="mb-8 font-display text-3xl text-cocoa">More from the Shop</h2>
+          <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
+            {customProducts.map((p) => (
+              <ProductCard key={p.handle} product={p} />
+            ))}
+          </div>
+        </div>
+      )}
     </section>
   );
 }

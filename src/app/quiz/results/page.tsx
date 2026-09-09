@@ -2,6 +2,7 @@ import Image from "next/image";
 import { getScent, scents } from "@/lib/scents";
 import ScentShopCard from "@/components/ScentShopCard";
 import Button from "@/components/ui/Button";
+import { getHiddenScentSlugs } from "@/lib/scent-visibility";
 
 export default async function QuizResultsPage({
   searchParams,
@@ -9,7 +10,12 @@ export default async function QuizResultsPage({
   searchParams: Promise<{ scent?: string }>;
 }) {
   const { scent: slug } = await searchParams;
-  const scent = getScent(slug ?? "") ?? scents[0];
+  const hiddenSlugs = await getHiddenScentSlugs();
+  const visibleScents = scents.filter((s) => !hiddenSlugs.has(s.slug));
+  const matched = getScent(slug ?? "");
+  // Never recommend a scent that's been hidden/discontinued, even if the
+  // quiz's scoring logic picked it before visibility was known here.
+  const scent = matched && !hiddenSlugs.has(matched.slug) ? matched : visibleScents[0] ?? scents[0];
 
   return (
     <>

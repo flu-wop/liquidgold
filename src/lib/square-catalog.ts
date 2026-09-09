@@ -3,6 +3,8 @@ import { getSquare } from "./square";
 import { getDb, ensureSchema } from "./db";
 import { scents } from "./scents";
 import { products } from "./products";
+import { getCustomProductsAdmin } from "./custom-products";
+import type { Product } from "./products";
 
 // ── Product catalog sync with Square ──
 // Mirrors our 15 SKUs (5 scents x 3 variants) into Square's Catalog as real
@@ -35,22 +37,40 @@ export async function syncCatalog(): Promise<SyncResult> {
     existing.rows.map((r) => [r.handle as string, { itemId: r.item_id as string, variationId: r.variation_id as string }])
   );
 
+  // Group EVERY sellable product — static catalog + admin-added custom
+  // products alike — by its `scent` slug. This is what lets a brand-new
+  // product line (e.g. "Gift Box", not one of the 5 hero scents) sync to
+  // Square exactly the same way the original 5 always have: one Square
+  // ITEM per group, one ITEM_VARIATION per type/size combo inside it.
+  const customProductsAdmin = await getCustomProductsAdmin();
+  const scentNameBySlug = new Map<string, string>(scents.map((s) => [s.slug, s.name]));
+  for (const cp of customProductsAdmin) {
+    if (!scentNameBySlug.has(cp.scent)) scentNameBySlug.set(cp.scent, cp.scentName);
+  }
+  const allProducts: Product[] = [...products, ...customProductsAdmin];
+  const groups = new Map<string, Product[]>();
+  for (const p of allProducts) {
+    if (!groups.has(p.scent)) groups.set(p.scent, []);
+    groups.get(p.scent)!.push(p);
+  }
+
   const batchObjects: unknown[] = [];
   let itemsCreated = 0;
   let itemsUpdated = 0;
 
-  for (const scent of scents) {
-    const scentProducts = products.filter((p) => p.scent === scent.slug);
-    if (scentProducts.length === 0) continue;
+  for (const [scentSlug, groupProducts] of groups) {
+    const staticScent = scents.find((s) => s.slug === scentSlug);
+    const itemDisplayName = scentNameBySlug.get(scentSlug) ?? scentSlug;
+    const itemDescription = staticScent?.story ?? groupProducts[0].description;
 
     // Use the first variant's existing item_id if any variant for this
-    // scent was already synced, so re-syncing updates in place.
-    const anyExisting = scentProducts.map((p) => existingByHandle.get(p.handle)).find(Boolean);
-    const itemId = anyExisting?.itemId ?? `#item-${scent.slug}`;
+    // group was already synced, so re-syncing updates in place.
+    const anyExisting = groupProducts.map((p) => existingByHandle.get(p.handle)).find(Boolean);
+    const itemId = anyExisting?.itemId ?? `#item-${scentSlug}`;
     const isNewItem = !anyExisting;
     if (isNewItem) itemsCreated++; else itemsUpdated++;
 
-    const variations = scentProducts.map((p) => {
+    const variations = groupProducts.map((p) => {
       const prior = existingByHandle.get(p.handle);
       const variationId = prior?.variationId ?? `#var-${p.handle}`;
       return {
@@ -75,8 +95,8 @@ export async function syncCatalog(): Promise<SyncResult> {
       id: itemId,
       presentAtAllLocations: true,
       itemData: {
-        name: scent.name,
-        description: scent.story,
+        name: itemDisplayName,
+        description: itemDescription,
         variations,
       },
     });
@@ -94,14 +114,12 @@ export async function syncCatalog(): Promise<SyncResult> {
     idMap.find((m) => m.clientObjectId === clientId)?.objectId ?? clientId.replace(/^#(item|var)-/, "");
 
   let variationCount = 0;
-  for (const scent of scents) {
-    const scentProducts = products.filter((p) => p.scent === scent.slug);
-    if (scentProducts.length === 0) continue;
-    const anyExisting = scentProducts.map((p) => existingByHandle.get(p.handle)).find(Boolean);
-    const clientItemId = anyExisting?.itemId ?? `#item-${scent.slug}`;
+  for (const [scentSlug, groupProducts] of groups) {
+    const anyExisting = groupProducts.map((p) => existingByHandle.get(p.handle)).find(Boolean);
+    const clientItemId = anyExisting?.itemId ?? `#item-${scentSlug}`;
     const realItemId = anyExisting ? clientItemId : resolve(clientItemId);
 
-    for (const p of scentProducts) {
+    for (const p of groupProducts) {
       const prior = existingByHandle.get(p.handle);
       const clientVarId = prior?.variationId ?? `#var-${p.handle}`;
       const realVarId = prior ? clientVarId : resolve(clientVarId);

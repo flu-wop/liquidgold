@@ -1,11 +1,12 @@
-import { featuredProducts } from "@/lib/products";
-import { getHiddenScentSlugs } from "@/lib/scent-visibility";
+import { getFeaturedProductsAsync } from "@/lib/catalog";
 import ProductCard from "@/components/ProductCard";
 import Button from "@/components/ui/Button";
 
-export default async function BestSellers() {
-  const hidden = await getHiddenScentSlugs();
-  const products = featuredProducts().filter((p) => !hidden.has(p.scent));
+export default async function BestSellers({ hiddenSlugs }: { hiddenSlugs: Set<string> }) {
+  // Static featured SKUs plus any admin-added products marked featured —
+  // merged so a brand-new product can show up here too.
+  const allFeatured = await getFeaturedProductsAsync();
+  const products = allFeatured.filter((p) => !hiddenSlugs.has(p.scent));
   return (
     <section className="mx-auto max-w-7xl px-6 py-20">
       <div className="mb-10 flex items-end justify-between">

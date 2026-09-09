@@ -5,6 +5,7 @@ import { productsByScent } from "@/lib/products";
 import ProductCard from "@/components/ProductCard";
 import Button from "@/components/ui/Button";
 import { getContentMap, getScentContent } from "@/lib/content";
+import { getHiddenScentSlugs } from "@/lib/scent-visibility";
 
 export const dynamic = "force-dynamic";
 
@@ -17,8 +18,13 @@ export default async function ScentDestinationPage({
   const scent = getScent(slug);
   if (!scent) notFound();
 
+  const hiddenSlugs = await getHiddenScentSlugs();
+  // A hidden scent is meant to be fully off the site, not just off the
+  // listing pages — direct/bookmarked links shouldn't still work.
+  if (hiddenSlugs.has(scent.slug)) notFound();
+
   const scentProducts = productsByScent(scent.slug);
-  const otherScents = scents.filter((s) => s.slug !== scent.slug);
+  const otherScents = scents.filter((s) => s.slug !== scent.slug && !hiddenSlugs.has(s.slug));
   const contentMap = await getContentMap();
   const display = getScentContent(contentMap, scent.slug);
 

@@ -1,7 +1,9 @@
 import { notFound } from "next/navigation";
 import { getProduct } from "@/lib/products";
+import { getCustomProducts } from "@/lib/custom-products";
 import { getScent } from "@/lib/scents";
 import { getContentMap, content } from "@/lib/content";
+import { getHiddenScentSlugs } from "@/lib/scent-visibility";
 import ProductDetailClient from "./ProductDetailClient";
 
 // Content (descriptions) is DB-backed and edited live from /admin/content —
@@ -15,8 +17,19 @@ export default async function ProductPage({
   params: Promise<{ handle: string }>;
 }) {
   const { handle } = await params;
-  const product = getProduct(handle);
+  let product = getProduct(handle);
+  let isCustom = false;
+  if (!product) {
+    const custom = await getCustomProducts({ includeInactive: false });
+    product = custom.find((p) => p.handle === handle);
+    isCustom = true;
+  }
   if (!product) notFound();
+
+  // Hidden scents are meant to be fully off the site — a direct link to
+  // one of their SKUs shouldn't still work just because listings hide it.
+  const hiddenSlugs = await getHiddenScentSlugs();
+  if (hiddenSlugs.has(product.scent)) notFound();
 
   const scent = getScent(product.scent);
 
@@ -33,7 +46,7 @@ export default async function ProductPage({
 
   return (
     <section className="mx-auto max-w-7xl px-6 py-16">
-      <ProductDetailClient initial={product} scent={scent} descriptions={descriptions} />
+      <ProductDetailClient initial={product} scent={scent} descriptions={descriptions} isCustom={isCustom} />
     </section>
   );
 }

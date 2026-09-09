@@ -4,6 +4,7 @@ import { getSquare } from "@/lib/square";
 import { getDb, ensureSchema } from "@/lib/db";
 import { rateLimit, clientIp } from "@/lib/rate-limit";
 import { getProduct } from "@/lib/products";
+import { getCustomProducts } from "@/lib/custom-products";
 import { sendOrderConfirmation } from "@/lib/resend";
 import { getAllCatalogVariationIds, getStockCounts } from "@/lib/square-catalog";
 
@@ -98,6 +99,9 @@ export async function POST(req: Request) {
   // synced yet, so checkout never breaks on a missing catalog mapping.
   const catalogIds = await getAllCatalogVariationIds();
   const stockCounts = await getStockCounts();
+  // Fetched once, not per cart line — avoids N redundant DB round trips
+  // for carts with multiple items.
+  const customProducts = await getCustomProducts({ includeInactive: false });
 
   let subtotalCents = 0;
   const resolvedItems: { name: string; size: string; type: string; qty: number; price: number }[] = [];
@@ -112,7 +116,7 @@ export async function POST(req: Request) {
     if (!line.handle || typeof line.qty !== "number" || line.qty < 1 || line.qty > 20) {
       return NextResponse.json({ error: "Invalid cart line" }, { status: 400 });
     }
-    const product = getProduct(line.handle);
+    const product = getProduct(line.handle) ?? customProducts.find((p) => p.handle === line.handle);
     if (!product) {
       return NextResponse.json({ error: `Unknown product: ${line.handle}` }, { status: 400 });
     }

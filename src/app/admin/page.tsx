@@ -3,10 +3,12 @@ import { getStockCounts } from "@/lib/square-catalog";
 import { products } from "@/lib/products";
 import { scents } from "@/lib/scents";
 import { getHiddenScentSlugs } from "@/lib/scent-visibility";
+import { getCustomProductsAdmin } from "@/lib/custom-products";
 import { isAuthed } from "@/lib/admin-auth";
 import AdminLoginForm from "./AdminLoginForm";
 import CatalogSync from "./CatalogSync";
 import ScentVisibility from "./ScentVisibility";
+import CustomProducts from "./CustomProducts";
 import OrdersList from "./OrdersList";
 import Accordion from "./Accordion";
 
@@ -20,14 +22,18 @@ export default async function AdminPage() {
 
   await ensureSchema();
   const db = getDb();
-  const [orders, wholesale, contacts, stockCounts, hiddenSlugs] = await Promise.all([
+  const [orders, wholesale, contacts, stockCounts, hiddenSlugs, customProducts] = await Promise.all([
     db.execute(`SELECT * FROM orders ORDER BY created_at DESC LIMIT 50`),
     db.execute(`SELECT * FROM wholesale_inquiries ORDER BY created_at DESC LIMIT 50`),
     db.execute(`SELECT * FROM contact_messages ORDER BY created_at DESC LIMIT 50`),
     getStockCounts(),
     getHiddenScentSlugs(),
+    getCustomProductsAdmin(),
   ]);
-  const stock = products.map((p) => ({
+  // Stock list covers both the static catalog and any admin-added products
+  // so new SKUs show up for inventory-setting once synced, same as the
+  // original 15.
+  const stock = [...products, ...customProducts].map((p) => ({
     handle: p.handle,
     name: `${p.name.split(" — ")[0]} (${p.size})`,
     count: stockCounts[p.handle] ?? null,
@@ -41,6 +47,7 @@ export default async function AdminPage() {
       <div className="mt-10">
         <Accordion title="Product Catalog">
           <ScentVisibility scents={scentRows} />
+          <CustomProducts products={customProducts} />
           <CatalogSync stock={stock} />
         </Accordion>
 

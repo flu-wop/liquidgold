@@ -4,7 +4,7 @@
 
 import { scents } from "./scents";
 
-export type ProductType = "Body Butter" | "Body Oil";
+export type ProductType = string;
 
 export type Product = {
   handle: string;

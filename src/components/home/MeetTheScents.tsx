@@ -3,7 +3,14 @@ import Image from "next/image";
 import { scents } from "@/lib/scents";
 import { getScentContent, type ContentKey } from "@/lib/content";
 
-export default function MeetTheScents({ contentMap }: { contentMap: Partial<Record<ContentKey, string>> }) {
+export default function MeetTheScents({
+  contentMap,
+  hiddenSlugs,
+}: {
+  contentMap: Partial<Record<ContentKey, string>>;
+  hiddenSlugs: Set<string>;
+}) {
+  const visibleScents = scents.filter((s) => !hiddenSlugs.has(s.slug));
   return (
     <section className="bg-cocoa py-20 text-cream">
       <div className="mx-auto max-w-7xl px-6">
@@ -17,7 +24,7 @@ export default function MeetTheScents({ contentMap }: { contentMap: Partial<Reco
       </div>
       {/* Full-bleed editorial rows using her real product photography */}
       <div className="divide-y divide-cream/10">
-        {scents.map((s, i) => {
+        {visibleScents.map((s, i) => {
           const display = getScentContent(contentMap, s.slug);
           return (
             <Link

@@ -7,6 +7,7 @@ import WhyLiquidGold from "@/components/home/WhyLiquidGold";
 import Reviews from "@/components/home/Reviews";
 import JoinParadise from "@/components/home/JoinParadise";
 import { getContentMap, content } from "@/lib/content";
+import { getHiddenScentSlugs } from "@/lib/scent-visibility";
 
 // Fetched fresh per request (not baked in at build time) so edits made in
 // admin show up without a redeploy — fails open to defaults, same pattern
@@ -14,7 +15,7 @@ import { getContentMap, content } from "@/lib/content";
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const contentMap = await getContentMap();
+  const [contentMap, hiddenSlugs] = await Promise.all([getContentMap(), getHiddenScentSlugs()]);
   return (
     <>
       <Hero
@@ -22,10 +23,10 @@ export default async function HomePage() {
         subheadline={content(contentMap, "hero.subheadline")}
         image={content(contentMap, "hero.image")}
       />
-      <BestSellers />
+      <BestSellers hiddenSlugs={hiddenSlugs} />
       <LiquidTrail />
-      <MeetTheScents contentMap={contentMap} />
-      <ShopByMood />
+      <MeetTheScents contentMap={contentMap} hiddenSlugs={hiddenSlugs} />
+      <ShopByMood hiddenSlugs={hiddenSlugs} />
       <WhyLiquidGold />
       <Reviews />
       <JoinParadise
