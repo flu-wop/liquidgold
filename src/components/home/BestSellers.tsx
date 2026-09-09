@@ -1,9 +1,11 @@
 import { featuredProducts } from "@/lib/products";
+import { getHiddenScentSlugs } from "@/lib/scent-visibility";
 import ProductCard from "@/components/ProductCard";
 import Button from "@/components/ui/Button";
 
-export default function BestSellers() {
-  const products = featuredProducts();
+export default async function BestSellers() {
+  const hidden = await getHiddenScentSlugs();
+  const products = featuredProducts().filter((p) => !hidden.has(p.scent));
   return (
     <section className="mx-auto max-w-7xl px-6 py-20">
       <div className="mb-10 flex items-end justify-between">

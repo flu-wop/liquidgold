@@ -1,6 +1,7 @@
 import { scents } from "@/lib/scents";
 import ScentShopCard from "@/components/ScentShopCard";
 import { getStockCounts } from "@/lib/square-catalog";
+import { getHiddenScentSlugs } from "@/lib/scent-visibility";
 
 // Stock counts must be fetched fresh on every request, not baked in at
 // build time — otherwise every visitor would see whatever stock existed
@@ -17,6 +18,8 @@ export default async function ShopPage() {
   } catch (e) {
     console.error("stock count fetch failed, shop page proceeding without it", e);
   }
+  const hidden = await getHiddenScentSlugs();
+  const visibleScents = scents.filter((s) => !hidden.has(s.slug));
   return (
     <section className="mx-auto max-w-7xl px-6 py-16">
       <h1 className="font-display text-4xl text-cocoa md:text-5xl">
@@ -26,7 +29,7 @@ export default async function ShopPage() {
         Pick a scent, then choose Body Butter or Body Oil and your size.
       </p>
       <div className="mt-10 grid grid-cols-2 gap-x-8 gap-y-12 md:grid-cols-4">
-        {scents.map((s) => (
+        {visibleScents.map((s) => (
           <ScentShopCard key={s.slug} scent={s} stock={stock} />
         ))}
       </div>

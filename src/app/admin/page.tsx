@@ -1,9 +1,12 @@
 import { getDb, ensureSchema } from "@/lib/db";
 import { getStockCounts } from "@/lib/square-catalog";
 import { products } from "@/lib/products";
+import { scents } from "@/lib/scents";
+import { getHiddenScentSlugs } from "@/lib/scent-visibility";
 import { isAuthed } from "@/lib/admin-auth";
 import AdminLoginForm from "./AdminLoginForm";
 import CatalogSync from "./CatalogSync";
+import ScentVisibility from "./ScentVisibility";
 import OrdersList from "./OrdersList";
 import Accordion from "./Accordion";
 
@@ -17,17 +20,19 @@ export default async function AdminPage() {
 
   await ensureSchema();
   const db = getDb();
-  const [orders, wholesale, contacts, stockCounts] = await Promise.all([
+  const [orders, wholesale, contacts, stockCounts, hiddenSlugs] = await Promise.all([
     db.execute(`SELECT * FROM orders ORDER BY created_at DESC LIMIT 50`),
     db.execute(`SELECT * FROM wholesale_inquiries ORDER BY created_at DESC LIMIT 50`),
     db.execute(`SELECT * FROM contact_messages ORDER BY created_at DESC LIMIT 50`),
     getStockCounts(),
+    getHiddenScentSlugs(),
   ]);
   const stock = products.map((p) => ({
     handle: p.handle,
     name: `${p.name.split(" — ")[0]} (${p.size})`,
     count: stockCounts[p.handle] ?? null,
   }));
+  const scentRows = scents.map((s) => ({ slug: s.slug, name: s.name, hidden: hiddenSlugs.has(s.slug) }));
 
   return (
     <section className="mx-auto max-w-5xl px-6 py-16">
@@ -35,6 +40,7 @@ export default async function AdminPage() {
 
       <div className="mt-10">
         <Accordion title="Product Catalog">
+          <ScentVisibility scents={scentRows} />
           <CatalogSync stock={stock} />
         </Accordion>
 

@@ -2,15 +2,20 @@
 // Resend, if we're not using Klaviyo for this) once email/SMS marketing is
 // scoped in Phase 3.
 
-export default function JoinParadise() {
+export default function JoinParadise({
+  headline,
+  subheadline,
+}: {
+  headline: string;
+  subheadline: string;
+}) {
   return (
     <section className="mx-auto max-w-3xl px-6 py-24 text-center">
       <h2 className="font-display text-3xl text-cocoa md:text-4xl">
-        Join <span className="text-gold-gradient italic">Paradise</span>
+        {headline}
       </h2>
       <p className="mx-auto mt-3 max-w-md text-cocoa/60">
-        Product launches, special offers, and skincare tips — no spam, just
-        sunshine.
+        {subheadline}
       </p>
       <form className="mx-auto mt-8 flex max-w-sm gap-2">
         <input

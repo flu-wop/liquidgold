@@ -28,7 +28,10 @@ export default async function HomePage() {
       <ShopByMood />
       <WhyLiquidGold />
       <Reviews />
-      <JoinParadise />
+      <JoinParadise
+        headline={content(contentMap, "joinParadise.headline")}
+        subheadline={content(contentMap, "joinParadise.subheadline")}
+      />
     </>
   );
 }

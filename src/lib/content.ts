@@ -26,6 +26,14 @@ Thank you for being here and for joining me on this journey. Your glow is waitin
 `At Liquid Gold Skin Co., we believe self care isn't just a luxury — it's a necessity. Every product is made with love and intention, turning your daily skincare into a ritual of self love and a reminder to let go of the harsh chemicals and preservatives. Preserve yourself inside and out.
 This is a journey that we are on together — letting go of the unnatural and making the effort to enjoy taking care of our body and skin more than ever. It is a war against the unnatural, and together we are going to win!` },
 
+  "joinParadise.headline": { label: "Homepage Bottom — Newsletter Headline", type: "text", default: "Join Paradise" },
+  "joinParadise.subheadline": { label: "Homepage Bottom — Newsletter Subheadline", type: "textarea", default: "Product launches, special offers, and skincare tips — no spam, just sunshine." },
+
+  "product.bodyButter.description": { label: "Body Butter — Description (applies to all scents)", type: "textarea", default:
+    "A rich, nourishing body butter made to deeply moisturize the skin and leave it feeling soft, smooth, and glowing. Made with a blend of moisturizing butters and skin-loving oils." },
+  "product.bodyOil.description": { label: "Body Oil — Description (applies to all scents)", type: "textarea", default:
+    "A lightweight moisturizing body oil designed to soften, nourish, and give the skin a beautiful glow without feeling heavy." },
+
   "scent.cocoa-cashmere.story": { label: "Cocoa Cashmere — Story", type: "textarea", default: "A warm, creamy fragrance that wraps the skin in coconut, soft florals, vanilla-tonka warmth, woods, amber, and musk." },
   "scent.cocoa-cashmere.vibe": { label: "Cocoa Cashmere — Vibe", type: "text", default: "Cozy, sexy, warm, comforting, and addictive." },
   "scent.cocoa-cashmere.image": { label: "Cocoa Cashmere — Photo", type: "image", default: "/images/products/cocoa-cashmere-butter.jpg" },

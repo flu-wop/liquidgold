@@ -12,9 +12,11 @@ import { trackViewItem } from "@/lib/analytics";
 export default function ProductDetailClient({
   initial,
   scent,
+  descriptions,
 }: {
   initial: Product;
   scent: Scent | undefined;
+  descriptions: { bodyButter: string; bodyOil: string };
 }) {
   const variants = productsByScent(initial.scent);
   const types = Array.from(new Set(variants.map((v) => v.type))) as ProductType[];
@@ -24,6 +26,10 @@ export default function ProductDetailClient({
   const active =
     variants.find((v) => v.type === type && v.size === size) ?? initial;
   const sizesForType = variants.filter((v) => v.type === type);
+  // `variants` comes from the static catalog, so its .description is always
+  // the hardcoded default — override with the admin-edited copy here so
+  // switching Body Butter <-> Body Oil mid-page still reflects /admin/content.
+  const activeDescription = active.type === "Body Butter" ? descriptions.bodyButter : descriptions.bodyOil;
 
   const { addItem } = useCart();
   const [added, setAdded] = useState(false);
@@ -108,7 +114,7 @@ export default function ProductDetailClient({
         )}
 
         <p className="mt-5 font-semibold text-2xl text-cocoa">${active.price}</p>
-        <p className="mt-4 text-cocoa/70">{active.description}</p>
+        <p className="mt-4 text-cocoa/70">{activeDescription}</p>
 
         {scent && scent.notes.length > 0 && (
           <p className="mt-4 text-sm text-cocoa/60">Notes: {scent.notes.join(" · ")}</p>
