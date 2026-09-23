@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import { Fraunces, Manrope } from "next/font/google";
+import "@flu-wop/design-system/core.css";
+import "@flu-wop/design-system/themes/liquidgold.css";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -33,7 +35,7 @@ export default function RootLayout({
   const tiktokPixelId = process.env.NEXT_PUBLIC_TIKTOK_PIXEL_ID;
 
   return (
-    <html lang="en">
+    <html data-theme="liquidgold" lang="en">
       <body className={`${fraunces.variable} ${manrope.variable} font-body`}>
         {/* Each pixel is entirely optional — unset env var means the
             corresponding script never loads. Safe to ship before Ariel
