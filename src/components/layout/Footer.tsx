@@ -49,14 +49,14 @@ export default function Footer() {
         © {new Date().getFullYear()} Liquid Gold Skin Co. All rights reserved.
       </p>
       <p className="mx-auto mt-3 max-w-7xl text-xs text-cream/30">
-        Built by{" "}
+        Designed by{" "}
         <a
           href="https://in-flu-ential.vercel.app"
           target="_blank"
           rel="noopener noreferrer"
           className="text-gold-light/70 hover:text-gold-light"
         >
-          IN-FLU-ENTIAL LLC
+          IN-FLU-ENTIAL
         </a>
       </p>
     </footer>
