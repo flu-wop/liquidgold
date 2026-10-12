@@ -1,3 +1,4 @@
+import { SiteAnalytics } from "@/components/analytics/SiteAnalytics"
 import type { Metadata } from "next";
 import Script from "next/script";
 import { Fraunces, Manrope } from "next/font/google";
@@ -37,6 +38,7 @@ export default function RootLayout({
   return (
     <html data-theme="liquidgold" lang="en">
       <body className={`${fraunces.variable} ${manrope.variable} font-body`}>
+        <SiteAnalytics />
         {/* Each pixel is entirely optional — unset env var means the
             corresponding script never loads. Safe to ship before Ariel
             sends her Measurement/Pixel IDs. */}

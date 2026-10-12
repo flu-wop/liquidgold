@@ -1,4 +1,5 @@
 "use client";
+import { beacon } from "@/lib/beacon"
 
 // REAL CHECKOUT — uses Square's Web Payments SDK to tokenize payment info
 // entirely client-side (card, Apple Pay, Google Pay, Cash App Pay). Raw
@@ -200,6 +201,7 @@ export default function CheckoutPage() {
       return false;
     }
 
+    beacon("checkout_click")
     const res = await fetch("/api/checkout", {
       method: "POST",
       headers: { "Content-Type": "application/json" },

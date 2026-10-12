@@ -8,6 +8,7 @@ const SECTIONS = [
   { href: "/admin",         icon: ShoppingBag, label: "Orders" },
   { href: "/admin/content", icon: FileEdit,    label: "Content" },
   { href: "/admin/funnel",  icon: BarChart3,   label: "Funnel" },
+  { href: "/admin/insights", icon: BarChart3,  label: "Insights" },
   { href: "/admin/system",  icon: Activity,    label: "System" },
 ]
 
