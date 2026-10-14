@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ChevronDown } from "lucide-react";
 
 export default function Accordion({
   title,
@@ -16,25 +17,20 @@ export default function Accordion({
   const [open, setOpen] = useState(defaultOpen);
 
   return (
-    <div className="border-b border-cocoa/10">
+    <section className="mt-3 bg-white border border-cocoa/15 overflow-hidden">
       <button
+        type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex w-full items-center justify-between py-5 text-left"
+        aria-expanded={open}
+        className="flex w-full items-center justify-between gap-3 px-4 sm:px-5 py-4 text-left hover:bg-sand/50 transition-colors"
       >
-        <span className="font-display text-2xl text-cocoa">
+        <span className="font-display text-lg sm:text-xl text-cocoa">
           {title}
-          {count !== undefined && (
-            <span className="ml-2 text-base font-normal text-cocoa/40">({count})</span>
-          )}
+          {count !== undefined && <span className="ml-2 text-sm font-normal text-cocoa/50">({count})</span>}
         </span>
-        <span
-          className={`text-guava transition-transform duration-200 ${open ? "rotate-180" : ""}`}
-          aria-hidden
-        >
-          &#9662;
-        </span>
+        <ChevronDown size={18} className="text-cocoa/50 transition-transform" style={{ transform: open ? "rotate(180deg)" : "none" }} aria-hidden />
       </button>
-      {open && <div className="pb-8">{children}</div>}
-    </div>
+      {open && <div className="px-4 sm:px-5 pb-5 border-t border-cocoa/10">{children}</div>}
+    </section>
   );
 }

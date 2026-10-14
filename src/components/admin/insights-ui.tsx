@@ -12,7 +12,7 @@ export function longDate(d: string) {
 
 export function Card({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="bg-white border border-cocoa/15 rounded-sm p-6">
+    <div className="bg-white border border-cocoa/15 p-5 sm:p-6">
       <h3 className="font-display text-xl text-lagoon-deep mb-4">{title}</h3>
       {children}
     </div>
@@ -29,7 +29,7 @@ function Delta({ cur, prev }: { cur: number; prev: number }) {
 
 export function Stat({ label, value, cur, prev }: { label: string; value: string; cur: number; prev: number }) {
   return (
-    <div className="bg-white border border-cocoa/15 rounded-sm p-5">
+    <div className="bg-white border border-cocoa/15 p-5">
       <div className="text-xs text-cocoa/65 uppercase tracking-wide mb-1">{label}</div>
       <div className="font-display text-3xl text-cocoa mb-1">{value}</div>
       <Delta cur={cur} prev={prev} />
@@ -65,7 +65,7 @@ export function Overview({ data }: { data: Insights }) {
       {data.attention.length > 0 && (
         <div className="grid sm:grid-cols-3 gap-3">
           {data.attention.map((a) => (
-            <div key={a.label} className={`border rounded-sm px-4 py-3 text-sm ${a.tone === "alert" && a.value > 0 ? "border-red-500/50 text-red-600" : "border-cocoa/15 text-cocoa/65"}`}>
+            <div key={a.label} className={`border  px-4 py-3 text-sm ${a.tone === "alert" && a.value > 0 ? "border-red-500/50 text-red-600" : "border-cocoa/15 text-cocoa/65"}`}>
               <b className="text-cocoa">{num(a.value)}</b> {a.label}
             </div>
           ))}
@@ -143,10 +143,10 @@ export function FunnelTab({ data }: { data: Insights }) {
                   <span className="text-cocoa">{s.label}</span>
                   <span className="text-cocoa/65">{num(s.value)}{i > 0 && f.steps[i - 1].value ? ` · ${Math.round((s.value / f.steps[i - 1].value) * 100)}% of previous` : ""}</span>
                 </div>
-                <div className="h-2 bg-cocoa/10 rounded-sm"><div className="h-2 bg-lagoon rounded-sm" style={{ width: `${(s.value / top) * 100}%` }} /></div>
+                <div className="h-2 bg-cocoa/10 "><div className="h-2 bg-lagoon " style={{ width: `${(s.value / top) * 100}%` }} /></div>
               </div>
             ))}
-            {sales && <div className="text-xs text-cocoa/65 mt-4">Completed purchases in this range: <b className="text-cocoa">{num(sales.total)}</b> (from Stripe, counted separately from visitor tracking).</div>}
+            {sales && <div className="text-xs text-cocoa/65 mt-4">Completed purchases in this range: <b className="text-cocoa">{num(sales.total)}</b> (from Square, counted separately from visitor tracking).</div>}
           </Card>
         )
       })}

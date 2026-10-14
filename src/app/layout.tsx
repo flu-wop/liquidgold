@@ -7,6 +7,7 @@ import "@flu-wop/design-system/themes/liquidgold.css";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import HideOnAdmin from "@/components/layout/HideOnAdmin";
 import { CartProvider } from "@/context/CartContext";
 
 const fraunces = Fraunces({
@@ -77,9 +78,9 @@ export default function RootLayout({
           </Script>
         )}
         <CartProvider>
-          <Navbar />
+          <HideOnAdmin><Navbar /></HideOnAdmin>
           <main>{children}</main>
-          <Footer />
+          <HideOnAdmin><Footer /></HideOnAdmin>
         </CartProvider>
       </body>
     </html>
