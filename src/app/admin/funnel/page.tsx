@@ -1,8 +1,9 @@
 import { isAuthed } from "@/lib/admin-auth";
-import AdminLoginForm from "../AdminLoginForm";
+import { AdminPage, AdminPageHeader, AdminLogin } from "@/components/admin/page-frame";
 import { getFunnelCounts, getAbandonedCheckouts } from "@/lib/funnel";
 
 export const runtime = "nodejs";
+export const metadata = { title: "Funnel · Admin", robots: { index: false } };
 export const dynamic = "force-dynamic";
 
 function pct(part: number, whole: number): string {
@@ -19,7 +20,7 @@ function timeAgo(unixSecs: number): string {
 }
 
 export default async function FunnelPage() {
-  if (!(await isAuthed())) return <AdminLoginForm />;
+  if (!(await isAuthed())) return <AdminLogin />;
 
   const [counts30, abandoned] = await Promise.all([
     getFunnelCounts(30),
@@ -34,15 +35,14 @@ export default async function FunnelPage() {
   ];
 
   return (
-    <section className="mx-auto max-w-5xl px-6 py-16">
-      <h1 className="font-display text-4xl text-cocoa">Funnel &amp; Conversion</h1>
-      <p className="mt-2 text-sm text-cocoa/60">
-        Last 30 days, counted by unique visitor session (not raw page views). Requires
-        GA_MEASUREMENT_ID / META_PIXEL_ID / TIKTOK_PIXEL_ID to be set for the platform-side
-        dashboards to also have this data — this table is our own independent copy.
-      </p>
+    <AdminPage>
+      <AdminPageHeader
+        eyebrow="Shop"
+        title="Funnel & Conversion"
+        description="Last 30 days, counted by unique visitor session (not raw page views). This is our own independent copy of the data, separate from GA, Meta and TikTok."
+      />
 
-      <div className="mt-8 divide-y divide-cocoa/10 border-t border-b border-cocoa/10">
+      <div className="divide-y divide-cocoa/10 border border-cocoa/15 bg-white px-4 sm:px-5">
         {stages.map((s, i) => (
           <div key={s.label} className="flex items-center justify-between py-4">
             <span className="text-cocoa">{s.label}</span>
@@ -61,11 +61,11 @@ export default async function FunnelPage() {
       </div>
 
       <div className="mt-10 grid gap-4 sm:grid-cols-2">
-        <div className="rounded-2xl bg-lagoon/10 p-6">
+        <div className="border border-cocoa/15 bg-white p-5">
           <p className="font-display text-3xl text-cocoa">{counts30.quizStarted}</p>
           <p className="mt-1 text-sm text-cocoa/60">Scent quiz started</p>
         </div>
-        <div className="rounded-2xl bg-lagoon/10 p-6">
+        <div className="border border-cocoa/15 bg-white p-5">
           <p className="font-display text-3xl text-cocoa">{counts30.quizCompleted}</p>
           <p className="mt-1 text-sm text-cocoa/60">
             Scent quiz completed ({pct(counts30.quizCompleted, counts30.quizStarted)})
@@ -73,7 +73,7 @@ export default async function FunnelPage() {
         </div>
       </div>
 
-      <div className="mt-12">
+      <div className="mt-10">
         <h2 className="font-display text-2xl text-cocoa">
           Abandoned Checkouts
           <span className="ml-2 text-base font-normal text-cocoa/40">({abandoned.length})</span>
@@ -83,7 +83,7 @@ export default async function FunnelPage() {
           email captured pre-payment on this stack, so these aren&apos;t individually followable
           without adding an earlier email-capture step.
         </p>
-        <div className="mt-4 divide-y divide-cocoa/10 border-t border-cocoa/10">
+        <div className="mt-4 divide-y divide-cocoa/10 border border-cocoa/15 bg-white px-4 sm:px-5">
           {abandoned.map((a) => (
             <div key={`${a.sessionId}-${a.createdAt}`} className="flex items-center justify-between py-3 text-sm">
               <span className="text-cocoa/70">{timeAgo(a.createdAt)}</span>
@@ -100,6 +100,6 @@ export default async function FunnelPage() {
           )}
         </div>
       </div>
-    </section>
+    </AdminPage>
   );
 }

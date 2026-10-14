@@ -1,19 +1,18 @@
 import { isAuthed } from "@/lib/admin-auth";
-import AdminLoginForm from "../AdminLoginForm";
+import { AdminPage, AdminPageHeader, AdminLogin } from "@/components/admin/page-frame";
 import SystemDashboard from "./SystemDashboard";
 
 export const runtime = "nodejs";
+export const metadata = { title: "System · Admin", robots: { index: false } };
 export const dynamic = "force-dynamic";
 
 export default async function SystemPage() {
-  if (!(await isAuthed())) return <AdminLoginForm />;
+  if (!(await isAuthed())) return <AdminLogin />;
 
   return (
-    <section className="mx-auto max-w-5xl px-6 py-16">
-      <h1 className="font-display text-4xl text-cocoa">System Health</h1>
-      <div className="mt-8">
-        <SystemDashboard />
-      </div>
-    </section>
+    <AdminPage>
+      <AdminPageHeader eyebrow="Health" title="System Health" description="Env vars, webhooks and integrations — is everything actually working." />
+      <SystemDashboard />
+    </AdminPage>
   );
 }

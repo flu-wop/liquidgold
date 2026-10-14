@@ -1,13 +1,14 @@
 import { isAuthed } from "@/lib/admin-auth";
-import AdminLoginForm from "../AdminLoginForm";
+import { AdminPage, AdminPageHeader, AdminLogin } from "@/components/admin/page-frame";
 import ContentEditor from "./ContentEditor";
 import { CONTENT_FIELDS, getContentMap, content, type ContentKey } from "@/lib/content";
 
 export const runtime = "nodejs";
+export const metadata = { title: "Content · Admin", robots: { index: false } };
 export const dynamic = "force-dynamic";
 
 export default async function ContentPage() {
-  if (!(await isAuthed())) return <AdminLoginForm />;
+  if (!(await isAuthed())) return <AdminLogin />;
 
   const map = await getContentMap();
   const values = {} as Record<ContentKey, string>;
@@ -16,12 +17,9 @@ export default async function ContentPage() {
   }
 
   return (
-    <section className="mx-auto max-w-5xl px-6 py-16">
-      <h1 className="font-display text-4xl text-cocoa">Edit Site Content</h1>
-      <p className="mt-2 text-sm text-cocoa/60">
-        Change wording and photos here — nothing here can break the site's layout or checkout.
-      </p>
+    <AdminPage>
+      <AdminPageHeader eyebrow="Site" title="Edit Site Content" description="Change wording and photos here — nothing here can break the site's layout or checkout." />
       <ContentEditor values={values} />
-    </section>
+    </AdminPage>
   );
 }
