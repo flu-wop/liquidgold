@@ -35,9 +35,11 @@ export default function RootLayout({
   const metaPixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID;
   const tiktokPixelId = process.env.NEXT_PUBLIC_TIKTOK_PIXEL_ID;
 
+  // next/font variables must live on <html>: the theme's --if-font-* tokens are
+  // declared there, and var(--font-manrope) is undefined if it's only on <body>.
   return (
-    <html data-theme="liquidgold" lang="en">
-      <body className={`${fraunces.variable} ${manrope.variable} font-body`}>
+    <html data-theme="liquidgold" lang="en" className={`${fraunces.variable} ${manrope.variable}`}>
+      <body className="font-body">
         <SiteAnalytics />
         {/* Each pixel is entirely optional — unset env var means the
             corresponding script never loads. Safe to ship before Ariel
