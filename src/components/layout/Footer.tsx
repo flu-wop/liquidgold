@@ -51,7 +51,7 @@ export default function Footer() {
       <p className="mx-auto mt-3 max-w-7xl text-xs text-cream/30">
         Designed by{" "}
         <a
-          href="https://in-flu-ential.vercel.app"
+          href="https://influential.live"
           target="_blank"
           rel="noopener noreferrer"
           className="text-gold-light/70 hover:text-gold-light"
