@@ -23,39 +23,41 @@ export default function CartPage() {
   }
 
   return (
-    <section className="mx-auto max-w-4xl px-6 py-16">
+    <section className="mx-auto max-w-4xl px-4 py-14 sm:px-6 md:py-16">
       <h1 className="font-display text-4xl text-cocoa md:text-5xl">
         Your <span className="text-gold-gradient italic">Cart</span>
       </h1>
 
       <div className="mt-10 divide-y divide-cocoa/10 border-t border-cocoa/10">
         {items.map((item) => (
-          <div key={item.handle} className="flex items-center gap-5 py-6">
+          <div key={item.handle} className="flex items-start gap-4 py-6 sm:items-center sm:gap-5">
             <div className="clip-corner relative h-24 w-24 flex-shrink-0 overflow-hidden bg-sand">
-              <Image src={item.image} alt={item.name} fill className="object-cover" />
+              <Image src={item.image} alt={item.name} fill sizes="96px" className="object-cover" />
             </div>
-            <div className="flex-1">
-              <p className="font-display text-lg text-cocoa">{item.name}</p>
+            <div className="min-w-0 flex-1">
+              <p className="font-display text-lg leading-tight text-cocoa">{item.name}</p>
               <p className="text-sm text-cocoa/50">
                 {item.type} · {item.size}
               </p>
               <div className="mt-2 flex items-center gap-3">
                 <button
                   onClick={() => updateQty(item.handle, item.qty - 1)}
-                  className="h-7 w-7 rounded-full border border-cocoa/20 text-cocoa/60 hover:border-cocoa"
+                  aria-label={`Decrease quantity of ${item.name}`}
+                  className="h-9 w-9 rounded-full border border-cocoa/20 text-cocoa/70 hover:border-cocoa"
                 >
                   –
                 </button>
                 <span className="w-6 text-center text-sm">{item.qty}</span>
                 <button
                   onClick={() => updateQty(item.handle, item.qty + 1)}
-                  className="h-7 w-7 rounded-full border border-cocoa/20 text-cocoa/60 hover:border-cocoa"
+                  aria-label={`Increase quantity of ${item.name}`}
+                  className="h-9 w-9 rounded-full border border-cocoa/20 text-cocoa/70 hover:border-cocoa"
                 >
                   +
                 </button>
                 <button
                   onClick={() => removeItem(item.handle)}
-                  className="ml-3 text-xs uppercase tracking-wide text-cocoa/40 hover:text-hibiscus"
+                  className="ml-1 min-h-[36px] px-2 text-xs uppercase tracking-wide text-cocoa/60 hover:text-hibiscus"
                 >
                   Remove
                 </button>
@@ -74,13 +76,13 @@ export default function CartPage() {
         Shipping and taxes calculated at checkout
       </p>
 
-      <div className="mt-8 flex justify-end gap-4">
+      <div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end sm:gap-4">
         <Button href="/shop" variant="ghost">
           Continue Shopping
         </Button>
         <Link
           href="/checkout"
-          className="inline-flex items-center justify-center rounded-full bg-guava px-7 py-3 font-body text-sm font-semibold text-cream transition-colors hover:bg-hibiscus"
+          className="inline-flex min-h-[44px] items-center justify-center rounded-full bg-guava px-7 py-3 font-body text-sm font-semibold text-cream transition-[background-color,transform] duration-200 hover:bg-hibiscus active:scale-[0.98] motion-reduce:active:scale-100"
         >
           Checkout
         </Link>

@@ -30,6 +30,7 @@ export default async function AboutPage() {
           alt="Ariel Salgado, founder of Liquid Gold Skin Co."
           width={1021}
           height={1080}
+          sizes="(max-width: 768px) 100vw, 768px"
           className="h-auto w-full object-cover"
         />
       </div>

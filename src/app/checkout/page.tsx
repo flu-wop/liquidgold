@@ -354,7 +354,7 @@ export default function CheckoutPage() {
             {items.map((item) => (
               <div key={item.handle} className="flex items-center gap-4">
                 <div className="clip-corner relative h-16 w-16 flex-shrink-0 overflow-hidden bg-cream">
-                  <Image src={item.image} alt={item.name} fill className="object-cover" />
+                  <Image src={item.image} alt={item.name} fill sizes="96px" className="object-cover" />
                 </div>
                 <div className="flex-1">
                   <p className="text-sm font-medium text-cocoa">{item.name}</p>

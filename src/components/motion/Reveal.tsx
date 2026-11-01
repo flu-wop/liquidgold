@@ -1,6 +1,7 @@
 "use client";
 
-import { motion, useReducedMotion, type Variants } from "framer-motion";
+import { useReducedMotionSafe } from "@/components/motion/useReducedMotionSafe";
+import { motion, type Variants } from "framer-motion";
 
 // Fade-up on scroll into view. Animates transform + opacity only, runs
 // once, and renders a plain static wrapper for reduced-motion users.
@@ -18,7 +19,7 @@ type RevealProps = {
 };
 
 export default function Reveal({ children, className, delay = 0, y = 28, as = "div" }: RevealProps) {
-  const reduce = useReducedMotion();
+  const reduce = useReducedMotionSafe();
   if (reduce) {
     const Tag = as;
     return <Tag className={className}>{children}</Tag>;
@@ -58,7 +59,7 @@ export function RevealGroup({
   id?: string;
   stagger?: number;
 }) {
-  const reduce = useReducedMotion();
+  const reduce = useReducedMotionSafe();
   if (reduce) return <div id={id} className={className}>{children}</div>;
   return (
     <motion.div
@@ -76,7 +77,7 @@ export function RevealGroup({
 }
 
 export function RevealItem({ children, className }: { children: React.ReactNode; className?: string }) {
-  const reduce = useReducedMotion();
+  const reduce = useReducedMotionSafe();
   if (reduce) return <div className={className}>{children}</div>;
   return (
     <motion.div className={className} variants={item}>

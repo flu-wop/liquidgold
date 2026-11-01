@@ -45,42 +45,38 @@ export default function Reviews({ founderImage }: { founderImage: string }) {
         </div>
       </section>
 
-      {/* Founder note */}
+      {/* Founder note — founder-ariel.jpg is her signature, so it signs the note */}
       <section className="bg-sand px-4 py-20 sm:px-6 md:py-28">
-        <div className="mx-auto grid max-w-6xl items-center gap-10 md:grid-cols-12 md:gap-16">
-          <Reveal className="md:col-span-5">
-            <div className="clip-corner relative aspect-[4/5] w-full overflow-hidden bg-cream">
-              <Image
-                src={founderImage}
-                alt="Ariel Salgado, founder of Liquid Gold Skin Co."
-                fill
-                sizes="(max-width: 768px) 100vw, 40vw"
-                className="object-cover"
-              />
-            </div>
-          </Reveal>
-          <Reveal className="md:col-span-7" delay={0.1}>
-            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-guava">A note from the founder</p>
-            <p className="mt-5 font-display text-3xl leading-[1.15] text-cocoa md:text-5xl">
-              &ldquo;This brand is more than skin deep to me.{" "}
-              <span className="text-gold-gradient italic">It&rsquo;s family deep.</span>&rdquo;
-            </p>
-            <p className="mt-6 max-w-lg text-lg leading-relaxed text-cocoa/75">
-              My skin journey began in 2019 — this has become my life and my passion. Thank you for
-              being here and for joining me on this journey. Your glow is waiting.
-            </p>
-            <p className="mt-6 font-display text-xl italic text-cocoa">— Ariel Salgado, founder</p>
-            <Link
-              href="/about"
-              className="group mt-8 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-widest text-cocoa"
-            >
-              Read her story
-              <span aria-hidden className="transition-transform group-hover:translate-x-1 motion-reduce:transition-none">
-                &rarr;
-              </span>
-            </Link>
-          </Reveal>
-        </div>
+        <Reveal className="mx-auto max-w-3xl text-center">
+          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-guava">A note from the founder</p>
+          <p className="mt-6 font-display text-3xl leading-[1.15] text-cocoa md:text-5xl">
+            &ldquo;This brand is more than skin deep to me.{" "}
+            <span className="text-gold-gradient italic">It&rsquo;s family deep.</span>&rdquo;
+          </p>
+          <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-cocoa/75">
+            My skin journey began in 2019 — this has become my life and my passion. Thank you for
+            being here and for joining me on this journey. Your glow is waiting.
+          </p>
+          <div className="relative mx-auto mt-8 h-24 w-56 md:h-28 md:w-64">
+            <Image
+              src={founderImage}
+              alt="Signature of Ariel Salgado, founder of Liquid Gold Skin Co."
+              fill
+              sizes="256px"
+              className="object-contain mix-blend-multiply"
+            />
+          </div>
+          <p className="mt-2 text-sm uppercase tracking-[0.2em] text-cocoa/60">Ariel Salgado, founder</p>
+          <Link
+            href="/about"
+            className="group mt-8 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-widest text-cocoa"
+          >
+            Read her story
+            <span aria-hidden className="transition-transform group-hover:translate-x-1 motion-reduce:transition-none">
+              &rarr;
+            </span>
+          </Link>
+        </Reveal>
       </section>
     </>
   );

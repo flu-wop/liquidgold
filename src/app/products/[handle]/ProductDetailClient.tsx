@@ -46,6 +46,11 @@ export default function ProductDetailClient({
 
   const { addItem } = useCart();
   const [added, setAdded] = useState(false);
+  // Gallery: main shot + optional alternate. Resets when the variant changes.
+  const shots = [active.image, active.hoverImage].filter(Boolean) as string[];
+  const [shot, setShot] = useState(0);
+  useEffect(() => setShot(0), [active.handle]);
+  const shown = shots[shot] ?? active.image;
 
   // Fire once per page landing, using the product actually landed on —
   // not every variant toggle, which would inflate view_item counts.
@@ -71,16 +76,37 @@ export default function ProductDetailClient({
   }
 
   return (
-    <div className="grid gap-12 md:grid-cols-2">
-      <div className="clip-corner relative aspect-[4/5] w-full overflow-hidden bg-sand">
-        <Image
-          src={active.image}
-          alt={active.name}
-          fill
-          sizes="(max-width: 768px) 100vw, 50vw"
-          className="object-cover"
-          priority
-        />
+    <div className="grid gap-10 md:grid-cols-2 md:gap-14">
+      <div className="md:sticky md:top-24 md:self-start">
+        <div className="clip-corner relative aspect-[4/5] w-full overflow-hidden bg-sand">
+          <Image
+            key={shown}
+            src={shown}
+            alt={active.name}
+            fill
+            sizes="(max-width: 768px) 100vw, 50vw"
+            className="animate-in fade-in object-cover duration-500 motion-reduce:animate-none"
+            priority
+          />
+        </div>
+        {shots.length > 1 && (
+          <div className="mt-3 flex gap-3">
+            {shots.map((src, i) => (
+              <button
+                key={src}
+                type="button"
+                onClick={() => setShot(i)}
+                aria-label={`Show photo ${i + 1} of ${shots.length}`}
+                aria-pressed={shot === i}
+                className={`relative h-20 w-16 overflow-hidden rounded-sm border-2 transition-colors ${
+                  shot === i ? "border-gold" : "border-transparent opacity-70 hover:opacity-100"
+                }`}
+              >
+                <Image src={src} alt="" fill sizes="64px" className="object-cover" />
+              </button>
+            ))}
+          </div>
+        )}
       </div>
       <div>
         {scent && (
@@ -88,7 +114,7 @@ export default function ProductDetailClient({
             {scent.name} · {scent.mood}
           </p>
         )}
-        <h1 className="mt-2 font-display text-5xl text-cocoa">
+        <h1 className="mt-3 font-display text-4xl leading-[0.98] text-cocoa sm:text-5xl md:text-6xl">
           {active.name.split(" — ")[0]}
         </h1>
 
@@ -98,7 +124,8 @@ export default function ProductDetailClient({
             <button
               key={t}
               onClick={() => handleTypeChange(t)}
-              className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
+              aria-pressed={type === t}
+              className={`min-h-[40px] rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
                 type === t
                   ? "border-cocoa bg-cocoa text-cream"
                   : "border-cocoa/20 text-cocoa/60 hover:border-cocoa/50"
@@ -114,7 +141,8 @@ export default function ProductDetailClient({
               <button
                 key={v.size}
                 onClick={() => setSize(v.size)}
-                className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
+                aria-pressed={size === v.size}
+                className={`min-h-[40px] rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
                   size === v.size
                     ? "border-guava bg-guava text-cream"
                     : "border-cocoa/20 text-cocoa/60 hover:border-guava/50"
@@ -152,7 +180,7 @@ export default function ProductDetailClient({
           <p className="mt-4 text-sm italic text-cocoa/40">Fragrance notes coming soon</p>
         )}
 
-        <div className="mt-8 flex gap-4">
+        <div className="mt-8 flex flex-wrap gap-3 sm:gap-4">
           <Button onClick={handleAdd}>{added ? "Added ✓" : "Add to Cart"}</Button>
           <Button variant="ghost">Add to Wishlist</Button>
         </div>

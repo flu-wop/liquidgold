@@ -1,7 +1,7 @@
 "use client";
 
+import { useReducedMotionSafe } from "@/components/motion/useReducedMotionSafe";
 import { useEffect, useRef, useState } from "react";
-import { useReducedMotion } from "framer-motion";
 import Button from "@/components/ui/Button";
 
 // Homepage brand film. Built for phones first:
@@ -30,7 +30,7 @@ const SOURCES = {
 const PORTRAIT_QUERY = "(max-width: 767px), (orientation: portrait) and (max-width: 1024px)";
 
 export default function BrandVideo() {
-  const reduce = useReducedMotion();
+  const reduce = useReducedMotionSafe();
   const sectionRef = useRef<HTMLElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [variant, setVariant] = useState<"portrait" | "landscape" | null>(null);
@@ -123,7 +123,7 @@ export default function BrandVideo() {
           />
         )}
         {/* scrim for text legibility over any frame */}
-        <div className="absolute inset-0 bg-gradient-to-t from-cocoa/85 via-cocoa/25 to-transparent md:bg-gradient-to-r md:from-cocoa/80 md:via-cocoa/30 md:to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-cocoa from-10% via-cocoa/70 via-45% to-transparent md:bg-gradient-to-r md:from-cocoa/80 md:via-cocoa/30 md:to-transparent" />
 
         <div className="absolute inset-x-0 bottom-0 px-6 pb-10 md:inset-y-0 md:flex md:max-w-xl md:flex-col md:justify-center md:pb-0 md:pl-16">
           <p className="text-xs font-semibold uppercase tracking-[0.25em] text-gold-light">The Ritual</p>

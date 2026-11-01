@@ -1,8 +1,9 @@
 "use client";
 
+import { useReducedMotionSafe } from "@/components/motion/useReducedMotionSafe";
 import { useRef } from "react";
 import Image from "next/image";
-import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -18,7 +19,7 @@ export function HeroHeadline({
   accentLast: boolean;
   className: string;
 }) {
-  const reduce = useReducedMotion();
+  const reduce = useReducedMotionSafe();
   return (
     <h1 className={className}>
       {lines.map((line, i) => {
@@ -51,7 +52,7 @@ export function HeroHeadline({
 
 // Fades the supporting copy/CTAs in after the headline lands.
 export function HeroFade({ children, delay = 0.6, className }: { children: React.ReactNode; delay?: number; className?: string }) {
-  const reduce = useReducedMotion();
+  const reduce = useReducedMotionSafe();
   if (reduce) return <div className={className}>{children}</div>;
   return (
     <motion.div
@@ -69,7 +70,7 @@ export function HeroFade({ children, delay = 0.6, className }: { children: React
 // image is `priority`.
 export function HeroImage({ src, alt }: { src: string; alt: string }) {
   const ref = useRef<HTMLDivElement>(null);
-  const reduce = useReducedMotion();
+  const reduce = useReducedMotionSafe();
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
   const y = useTransform(scrollYProgress, [0, 1], ["0%", "12%"]);
 

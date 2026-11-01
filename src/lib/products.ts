@@ -242,7 +242,7 @@ export const products: Product[] = scents.flatMap((s) => {
       },
       {
         handle: slugify(s.slug, "Travel Kit", "4-Piece"),
-        name: `${s.name} 4-Piece Travel Kit — 4-Piece`,
+        name: `${s.name} Travel Kit — 4-Piece`,
         scent: s.slug,
         type: "Travel Kit",
         size: "4-Piece",

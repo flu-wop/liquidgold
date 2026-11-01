@@ -1,9 +1,10 @@
 "use client";
 
+import { useReducedMotionSafe } from "@/components/motion/useReducedMotionSafe";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { AnimatePresence, motion, useAnimationControls, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion, useAnimationControls } from "framer-motion";
 import { useCart } from "@/context/CartContext";
 import ScrollProgress from "@/components/motion/ScrollProgress";
 
@@ -22,7 +23,7 @@ export default function Navbar() {
   const { count } = useCart();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const reduce = useReducedMotion();
+  const reduce = useReducedMotionSafe();
   const pathname = usePathname();
 
   // Compact + blurred once the page has scrolled past ~80px.
