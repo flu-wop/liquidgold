@@ -10,7 +10,7 @@ export default function JoinParadise({
   subheadline: string;
 }) {
   return (
-    <section className="mx-auto max-w-3xl px-6 py-24 text-center">
+    <section id="join-paradise" className="mx-auto max-w-3xl scroll-mt-24 px-6 py-24 text-center">
       <h2 className="font-display text-3xl text-cocoa md:text-4xl">
         {headline}
       </h2>

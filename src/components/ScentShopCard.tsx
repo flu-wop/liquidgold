@@ -6,6 +6,7 @@ import Image from "next/image";
 import { productsByScent, type ProductType } from "@/lib/products";
 import type { Scent } from "@/lib/scents";
 import { useCart } from "@/context/CartContext";
+import Price from "@/components/ui/Price";
 
 type Stock = Record<string, number | null>;
 
@@ -40,14 +41,14 @@ export default function ScentShopCard({ scent, stock = {} }: { scent: Scent; sto
 
   return (
     <div className="group">
-      <Link href={`/products/${active.handle}`} className="block">
+      <Link href={`/products/${active.handle}`} className="block" aria-label={`${scent.name} — view ${active.type} details`}>
         <div className="clip-corner relative aspect-[3/4] w-full overflow-hidden bg-sand">
           <Image
             src={active.image}
             alt={active.name}
             fill
             sizes="(max-width: 768px) 50vw, 25vw"
-            className={`object-cover transition-transform duration-300 group-hover:scale-[1.04] ${soldOut ? "opacity-40 grayscale" : ""}`}
+            className={`object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05] motion-reduce:transition-none motion-reduce:group-hover:scale-100 ${soldOut ? "opacity-40 grayscale" : ""}`}
           />
           {soldOut && (
             <span className="absolute left-2 top-2 rounded-full bg-cocoa px-3 py-1 text-xs font-semibold text-cream">
@@ -56,8 +57,8 @@ export default function ScentShopCard({ scent, stock = {} }: { scent: Scent; sto
           )}
         </div>
       </Link>
-      <p className="mt-4 font-display text-xl text-cocoa">{scent.name}</p>
-      <p className="text-sm uppercase tracking-wide text-cocoa/50">{scent.mood}</p>
+      <p className="mt-4 font-display text-xl leading-tight text-cocoa md:text-2xl">{scent.name}</p>
+      <p className="mt-0.5 text-xs uppercase tracking-[0.18em]" style={{ color: scent.accent }}>{scent.mood}</p>
 
       {/* Variant selectors — type first, then size */}
       <div className="mt-3 flex flex-wrap gap-1.5">
@@ -65,7 +66,8 @@ export default function ScentShopCard({ scent, stock = {} }: { scent: Scent; sto
           <button
             key={t}
             onClick={() => handleTypeChange(t)}
-            className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
+            aria-pressed={type === t}
+            className={`min-h-[32px] rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
               type === t
                 ? "border-cocoa bg-cocoa text-cream"
                 : "border-cocoa/20 text-cocoa/60 hover:border-cocoa/50"
@@ -81,7 +83,8 @@ export default function ScentShopCard({ scent, stock = {} }: { scent: Scent; sto
             <button
               key={v.size}
               onClick={() => setSize(v.size)}
-              className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
+              aria-pressed={size === v.size}
+              className={`min-h-[32px] rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
                 size === v.size
                   ? "border-guava bg-guava text-cream"
                   : "border-cocoa/20 text-cocoa/60 hover:border-guava/50"
@@ -93,12 +96,12 @@ export default function ScentShopCard({ scent, stock = {} }: { scent: Scent; sto
         </div>
       )}
 
-      <div className="mt-3 flex items-center justify-between">
-        <p className="font-semibold text-guava">${active.price}</p>
+      <Price price={active.price} compareAt={active.compareAtPrice} className="mt-3" />
+      <div className="mt-3">
         <button
           onClick={handleAdd}
           disabled={soldOut}
-          className="rounded-full bg-cocoa px-4 py-1.5 text-xs font-semibold text-cream transition-colors hover:bg-guava disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-cocoa"
+          className="min-h-[40px] w-full rounded-full bg-cocoa px-4 py-2 text-xs font-semibold text-cream transition-[background-color,transform] duration-200 hover:bg-guava active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-cocoa motion-reduce:active:scale-100"
         >
           {soldOut ? "Sold Out" : justAdded ? "Added ✓" : "Add to Cart"}
         </button>

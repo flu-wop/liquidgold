@@ -40,7 +40,7 @@ This is a journey that we are on together — letting go of the unnatural and ma
 
   "scent.juicy-paradise.story": { label: "Juicy Paradise — Story", type: "textarea", default: "A juicy tropical blend overflowing with ripe peach, guava, mango, papaya, and soft white florals." },
   "scent.juicy-paradise.vibe": { label: "Juicy Paradise — Vibe", type: "text", default: "Bright sunshine, tropical fruit, warm skin, and vacation energy." },
-  "scent.juicy-paradise.image": { label: "Juicy Paradise — Photo", type: "image", default: "/images/products/juicy-paradise.png" },
+  "scent.juicy-paradise.image": { label: "Juicy Paradise — Photo", type: "image", default: "/images/products/juicy-paradise.jpg" },
 
   "scent.bare-current.story": { label: "Bare Current — Story", type: "textarea", default: "A fresh, skin-like fragrance inspired by warm sun, ocean air, sea spray, soft jasmine, and marine musk." },
   "scent.bare-current.vibe": { label: "Bare Current — Vibe", type: "text", default: "Fresh out of the ocean, sun-warmed skin, clean air, and effortless island energy." },

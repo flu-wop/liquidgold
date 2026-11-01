@@ -6,6 +6,8 @@ import ShopByMood from "@/components/home/ShopByMood";
 import WhyLiquidGold from "@/components/home/WhyLiquidGold";
 import Reviews from "@/components/home/Reviews";
 import JoinParadise from "@/components/home/JoinParadise";
+import BrandVideo from "@/components/home/BrandVideo";
+import SetsAndExtras from "@/components/home/SetsAndExtras";
 import { getContentMap, content } from "@/lib/content";
 import { getHiddenScentSlugs } from "@/lib/scent-visibility";
 
@@ -24,6 +26,8 @@ export default async function HomePage() {
         image={content(contentMap, "hero.image")}
       />
       <BestSellers hiddenSlugs={hiddenSlugs} />
+      <BrandVideo />
+      <SetsAndExtras hiddenSlugs={hiddenSlugs} />
       <LiquidTrail />
       <MeetTheScents contentMap={contentMap} hiddenSlugs={hiddenSlugs} />
       <ShopByMood hiddenSlugs={hiddenSlugs} />

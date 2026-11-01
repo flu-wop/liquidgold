@@ -7,6 +7,7 @@ import type { Scent } from "@/lib/scents";
 import { useCart } from "@/context/CartContext";
 import Button from "@/components/ui/Button";
 import Reassurance from "@/components/ui/Reassurance";
+import Price from "@/components/ui/Price";
 import { trackViewItem } from "@/lib/analytics";
 
 export default function ProductDetailClient({
@@ -33,10 +34,15 @@ export default function ProductDetailClient({
   // `variants` comes from the static catalog, so its .description is always
   // the hardcoded default — override with the admin-edited copy here so
   // switching Body Butter <-> Body Oil mid-page still reflects /admin/content.
-  // Custom products carry their own real, per-product description instead.
+  // Custom products — and the bundle / perfume / travel kit SKUs, which have
+  // no admin-editable copy yet — carry their own per-product description.
   const activeDescription = isCustom
     ? active.description
-    : active.type === "Body Butter" ? descriptions.bodyButter : descriptions.bodyOil;
+    : active.type === "Body Butter"
+      ? descriptions.bodyButter
+      : active.type === "Body Oil"
+        ? descriptions.bodyOil
+        : active.description;
 
   const { addItem } = useCart();
   const [added, setAdded] = useState(false);
@@ -120,8 +126,24 @@ export default function ProductDetailClient({
           </div>
         )}
 
-        <p className="mt-5 font-semibold text-2xl text-cocoa">${active.price}</p>
+        <Price price={active.price} compareAt={active.compareAtPrice} size="lg" className="mt-5" />
         <p className="mt-4 text-cocoa/70">{activeDescription}</p>
+
+        {active.includes && active.includes.length > 0 && (
+          <div className="mt-5">
+            <p className="text-xs font-semibold uppercase tracking-widest text-cocoa/60">
+              What&rsquo;s inside
+            </p>
+            <ul className="mt-2 space-y-1.5 text-sm text-cocoa/80">
+              {active.includes.map((item) => (
+                <li key={item} className="flex gap-2">
+                  <span aria-hidden className="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-gold" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         {scent && scent.notes.length > 0 && (
           <p className="mt-4 text-sm text-cocoa/60">Notes: {scent.notes.join(" · ")}</p>
@@ -145,7 +167,11 @@ export default function ProductDetailClient({
           </div>
           <div>
             <p className="font-semibold text-cocoa">Ingredients</p>
-            <p className="mt-1">{active.ingredients.join(", ")}</p>
+            {active.ingredients.length > 0 ? (
+              <p className="mt-1">{active.ingredients.join(", ")}</p>
+            ) : (
+              <p className="mt-1 italic text-cocoa/50">Full ingredient list coming soon</p>
+            )}
           </div>
         </div>
       </div>

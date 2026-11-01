@@ -14,7 +14,7 @@ export type Scent = {
   accent: string;
   notes: string[]; // empty = notes pending, don't render a notes line
   story: string; // her "short description"
-  availableIn: ("Body Butter" | "Body Oil")[];
+  availableIn: ("Body Butter" | "Body Oil" | "Bundle" | "Perfume" | "Travel Kit")[];
   image: string;
 };
 
@@ -40,7 +40,7 @@ export const scents: Scent[] = [
     ],
     story:
       "A warm, creamy fragrance that wraps the skin in coconut, soft florals, vanilla-tonka warmth, woods, amber, and musk.",
-    availableIn: ["Body Butter", "Body Oil"],
+    availableIn: ["Body Butter", "Body Oil", "Bundle", "Perfume", "Travel Kit"],
     image: "/images/products/cocoa-cashmere-butter.jpg",
   },
   {
@@ -53,8 +53,8 @@ export const scents: Scent[] = [
     notes: ["White Florals", "Peach", "Guava", "Mango", "Papaya"],
     story:
       "A juicy tropical blend overflowing with ripe peach, guava, mango, papaya, and soft white florals.",
-    availableIn: ["Body Butter", "Body Oil"],
-    image: "/images/products/juicy-paradise.png",
+    availableIn: ["Body Butter", "Body Oil", "Bundle", "Perfume", "Travel Kit"],
+    image: "/images/products/juicy-paradise.jpg",
   },
   {
     slug: "bare-current",
@@ -69,7 +69,7 @@ export const scents: Scent[] = [
     notes: ["Sea Spray", "Sunstone", "Marine Musk", "Jasmine"],
     story:
       "A fresh, skin-like fragrance inspired by warm sun, ocean air, sea spray, soft jasmine, and marine musk.",
-    availableIn: ["Body Butter", "Body Oil"],
+    availableIn: ["Body Butter", "Body Oil", "Bundle", "Perfume", "Travel Kit"],
     image: "/images/products/bare-current-oil.jpg",
   },
   {
@@ -84,7 +84,7 @@ export const scents: Scent[] = [
     notes: [],
     story:
       "A playful, tropical fragrance made to feel bright, feminine, fun, and vacation-ready.",
-    availableIn: ["Body Butter", "Body Oil"],
+    availableIn: ["Body Butter", "Body Oil", "Bundle", "Perfume", "Travel Kit"],
     image: "/images/products/pink-fantasy.jpg",
   },
   {
@@ -96,7 +96,7 @@ export const scents: Scent[] = [
     accent: "#C9A46B",
     notes: [],
     story: "No added fragrance. Naturally carries a light cocoa butter aroma.",
-    availableIn: ["Body Butter", "Body Oil"],
+    availableIn: ["Body Butter", "Body Oil", "Bundle"],
     image: "/images/products/unscented-butter.jpg",
   },
 ];
