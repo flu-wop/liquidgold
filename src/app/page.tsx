@@ -28,11 +28,18 @@ export default async function HomePage() {
       <BestSellers hiddenSlugs={hiddenSlugs} />
       <BrandVideo />
       <SetsAndExtras hiddenSlugs={hiddenSlugs} />
-      <LiquidTrail />
+      {/* cream -> cocoa */}
+      <div className="bg-cream">
+        <LiquidTrail tone="cocoa" />
+      </div>
       <MeetTheScents contentMap={contentMap} hiddenSlugs={hiddenSlugs} />
+      {/* cocoa -> sand */}
+      <div className="bg-sand">
+        <LiquidTrail tone="cocoa" flip />
+      </div>
       <ShopByMood hiddenSlugs={hiddenSlugs} />
       <WhyLiquidGold />
-      <Reviews />
+      <Reviews founderImage={content(contentMap, "about.founderImage")} />
       <JoinParadise
         headline={content(contentMap, "joinParadise.headline")}
         subheadline={content(contentMap, "joinParadise.subheadline")}
