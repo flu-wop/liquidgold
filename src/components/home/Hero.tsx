@@ -19,14 +19,13 @@ export default function Hero({ headline, subheadline, image }: HeroProps) {
       <section className="relative isolate overflow-hidden bg-sand">
         {/* Mobile: image leads, headline rises over its faded lower edge.
             Desktop: full-height image on the right, headline overlaps its
-            left edge where a sand gradient keeps the type legible. */}
-        <div className="relative aspect-[4/5] w-full sm:aspect-[16/11] md:absolute md:inset-y-0 md:right-0 md:aspect-auto md:w-[62%]">
+            left edge. The fade is a mask on the photo itself (.hero-fade),
+            not a gradient overlay — overlay edges drew a hairline seam on
+            iOS Safari/WebKit. */}
+        <div className="hero-fade relative aspect-[4/5] w-full sm:aspect-[16/11] md:absolute md:inset-y-0 md:right-0 md:aspect-auto md:w-[62%]">
           <div className="clip-corner absolute inset-0 md:[clip-path:none]">
             <HeroImage src={image} alt="Liquid Gold Skin Co. — island-inspired body care ritual" />
           </div>
-          {/* scrims: bottom fade on mobile, left fade on desktop */}
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-sand from-25% via-sand/80 via-70% to-sand/0 to-100% md:hidden" />
-          <div className="pointer-events-none absolute inset-y-0 -left-px hidden w-[calc(50%+1px)] bg-gradient-to-r from-sand via-sand/75 via-60% to-sand/0 to-100% md:block" />
         </div>
 
         <div className="relative z-10 mx-auto -mt-20 max-w-7xl px-5 pb-14 sm:-mt-28 sm:px-6 md:mt-0 md:flex md:min-h-[calc(100svh-4.5rem)] md:items-center md:py-24">

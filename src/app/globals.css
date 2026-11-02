@@ -37,6 +37,19 @@ body {
     clip-path: polygon(0 0, 100% 0, 100% 88%, 88% 100%, 0 100%);
   }
 
+  /* Hero photo fades into the sand background via a mask (bottom on
+     mobile, left on desktop) so no overlay edge can render a seam. */
+  .hero-fade {
+    -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 50%, rgba(0, 0, 0, 0.2) 75%, transparent 90%);
+    mask-image: linear-gradient(to bottom, #000 0%, #000 50%, rgba(0, 0, 0, 0.2) 75%, transparent 90%);
+  }
+  @media (min-width: 768px) {
+    .hero-fade {
+      -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.25) 25%, #000 50%);
+      mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.25) 25%, #000 50%);
+    }
+  }
+
   .grain {
     position: relative;
   }
