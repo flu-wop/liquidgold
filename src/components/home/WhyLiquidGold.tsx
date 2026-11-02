@@ -3,7 +3,7 @@ import Reveal, { RevealGroup, RevealItem } from "@/components/motion/Reveal";
 
 const benefits = [
   { title: "Deep Hydration", desc: "Shea and cocoa butter base, whipped for 48 hours." },
-  { title: "Glowing Skin", desc: "Squalane and jojoba oil for a natural, non-greasy glow." },
+  { title: "Glowing Skin", desc: "Jojoba and avocado oil for a natural, non-greasy glow." },
   { title: "Small-Batch", desc: "Made fresh in Bermuda-inspired batches, never mass-produced." },
   { title: "Island Fragrance", desc: "Every scent tells a story rooted in a real place." },
 ];

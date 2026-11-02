@@ -14,7 +14,7 @@ import Reveal, { RevealGroup, RevealItem } from "@/components/motion/Reveal";
 const highlights = [
   { label: "48-Hour Whip", detail: "Shea and cocoa butter base, whipped for 48 hours for a texture that melts on contact." },
   { label: "Small-Batch", detail: "Made fresh in Bermuda-inspired batches, never mass-produced or left sitting in a warehouse." },
-  { label: "Squalane + Jojoba", detail: "Non-greasy glow, formulated to absorb fast instead of sitting on top of the skin." },
+  { label: "Jojoba + Avocado Oil", detail: "Skin-loving oils in every butter and oil, for a non-greasy glow that absorbs fast instead of sitting on top of the skin." },
 ];
 
 export default function Reviews({ founderImage }: { founderImage: string }) {
