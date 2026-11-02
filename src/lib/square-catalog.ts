@@ -54,6 +54,21 @@ export async function syncCatalog(): Promise<SyncResult> {
     groups.get(p.scent)!.push(p);
   }
 
+  // Square rejects an update to an existing catalog object unless it carries
+  // the object's CURRENT version (VERSION_MISMATCH). Fetch the live versions
+  // of everything we've already synced — items and variations — and send
+  // them back with the upsert. Brand-new objects have no version.
+  const versionById = new Map<string, bigint>();
+  const knownIds = Array.from(
+    new Set(Array.from(existingByHandle.values()).flatMap((m) => [m.itemId, m.variationId]))
+  );
+  for (let i = 0; i < knownIds.length; i += 100) {
+    const got = await square.catalog.batchGet({ objectIds: knownIds.slice(i, i + 100) });
+    for (const o of got.objects ?? []) {
+      if (o.id && o.version !== undefined && o.version !== null) versionById.set(o.id, BigInt(o.version));
+    }
+  }
+
   const batchObjects: unknown[] = [];
   let itemsCreated = 0;
   let itemsUpdated = 0;
@@ -76,6 +91,7 @@ export async function syncCatalog(): Promise<SyncResult> {
       return {
         type: "ITEM_VARIATION",
         id: variationId,
+        ...(versionById.has(variationId) ? { version: versionById.get(variationId) } : {}),
         presentAtAllLocations: true,
         itemVariationData: {
           itemId,
@@ -93,6 +109,7 @@ export async function syncCatalog(): Promise<SyncResult> {
     batchObjects.push({
       type: "ITEM",
       id: itemId,
+      ...(versionById.has(itemId) ? { version: versionById.get(itemId) } : {}),
       presentAtAllLocations: true,
       itemData: {
         name: itemDisplayName,
