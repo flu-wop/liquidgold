@@ -24,14 +24,14 @@ export default async function AboutPage() {
         ))}
       </div>
 
-      <div className="mt-10 overflow-hidden rounded-3xl">
+      <div className="mt-10">
         <Image
           src={founderImage}
-          alt="Ariel Salgado, founder of Liquid Gold Skin Co."
-          width={1021}
-          height={1080}
-          sizes="(max-width: 768px) 100vw, 768px"
-          className="h-auto w-full object-cover"
+          alt="Signature of Ariel Salgado, founder of Liquid Gold Skin Co."
+          width={800}
+          height={692}
+          sizes="(max-width: 768px) 60vw, 280px"
+          className="h-auto w-56 max-w-full object-contain sm:w-64"
         />
       </div>
 

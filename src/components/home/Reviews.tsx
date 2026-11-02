@@ -45,7 +45,7 @@ export default function Reviews({ founderImage }: { founderImage: string }) {
         </div>
       </section>
 
-      {/* Founder note — founder-ariel.jpg is her signature, so it signs the note */}
+      {/* Founder note — the founder image is her signature, so it signs the note */}
       <section className="bg-sand px-4 py-20 sm:px-6 md:py-28">
         <Reveal className="mx-auto max-w-3xl text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.25em] text-guava">A note from the founder</p>
@@ -63,7 +63,7 @@ export default function Reviews({ founderImage }: { founderImage: string }) {
               alt="Signature of Ariel Salgado, founder of Liquid Gold Skin Co."
               fill
               sizes="256px"
-              className="object-contain mix-blend-multiply"
+              className="object-contain"
             />
           </div>
           <p className="mt-2 text-sm uppercase tracking-[0.2em] text-cocoa/60">Ariel Salgado, founder</p>

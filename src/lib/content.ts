@@ -21,7 +21,7 @@ Being surrounded by the incredibly strong women in my family set my mind on succ
 And through that survival, you grow. I didn't know what was right or wrong, but I knew one thing: I love to learn. I dove into research, experimented with natural ingredients, and slowly began creating products for myself.
 My skin journey began in 2019 — this has become my life and my passion. Over the years, I continued to make transitions out of consumerism that is detrimental to our skin and ultimately our health. This is my way of transforming an idea taught to us that we know to question but are confused how to into something beautiful and intentional.
 Thank you for being here and for joining me on this journey. Your glow is waiting.` },
-  "about.founderImage": { label: "About — Founder Photo", type: "image", default: "/images/brand/founder-ariel.jpg" },
+  "about.founderImage": { label: "About — Founder Photo", type: "image", default: "/images/brand/founder-signature.png" },
   "about.mission": { label: "About — Our Mission (one paragraph per line)", type: "textarea", default:
 `At Liquid Gold Skin Co., we believe self care isn't just a luxury — it's a necessity. Every product is made with love and intention, turning your daily skincare into a ritual of self love and a reminder to let go of the harsh chemicals and preservatives. Preserve yourself inside and out.
 This is a journey that we are on together — letting go of the unnatural and making the effort to enjoy taking care of our body and skin more than ever. It is a war against the unnatural, and together we are going to win!` },
