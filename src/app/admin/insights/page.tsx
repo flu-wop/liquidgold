@@ -49,7 +49,7 @@ export default async function InsightsPage({ searchParams }: { searchParams: Pro
       />
 
       <div className="-mx-4 sm:mx-0 mb-6 border-b border-cocoa/15">
-        <nav aria-label="Insights tabs" className="flex gap-5 sm:gap-7 overflow-x-auto no-scrollbar px-4 sm:px-0">
+        <nav aria-label="Insights tabs" className="flex gap-5 sm:gap-7 overflow-x-auto no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
           {TABS.map((t) => (
             <Link
               key={t.id}

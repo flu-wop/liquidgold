@@ -60,10 +60,10 @@ export default function Hero({ headline, subheadline, image }: HeroProps) {
       <Marquee
         className="bg-cocoa py-3.5 font-body text-xs font-semibold uppercase tracking-[0.25em] text-cream/90"
         items={[
-          "Free shipping over $50",
+          "Free shipping over $75",
           "Small-batch, made fresh",
           "Island-inspired body care",
-          "Free shipping over $50",
+          "Free shipping over $75",
           "Small-batch, made fresh",
           "Island-inspired body care",
         ]}

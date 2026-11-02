@@ -18,6 +18,7 @@ import Image from "next/image";
 import { useCart } from "@/context/CartContext";
 import Button from "@/components/ui/Button";
 import { trackBeginCheckout, trackPurchase } from "@/lib/analytics";
+import { findPromo, shippingFor, type Promo } from "@/lib/promos";
 
 type SquarePayments = {
   card: () => Promise<SquareCardMethod>;
@@ -44,14 +45,6 @@ declare global {
   }
 }
 
-// Client-side mirror of the server's discount map — for live display only.
-// The server re-validates and re-applies the real discount independently;
-// nothing here is trusted for the actual charge.
-const DISPLAY_DISCOUNT_CODES: Record<string, number> = {
-  ISLAND15: 15,
-  ISLAND20: 20,
-};
-
 export default function CheckoutPage() {
   const { items, subtotal, clear } = useCart();
   const router = useRouter();
@@ -60,7 +53,7 @@ export default function CheckoutPage() {
   const [sdkReady, setSdkReady] = useState(false);
   const [walletsAvailable, setWalletsAvailable] = useState({ applePay: false, googlePay: false, cashAppPay: false });
   const [discountInput, setDiscountInput] = useState("");
-  const [appliedDiscount, setAppliedDiscount] = useState<{ code: string; pct: number } | null>(null);
+  const [appliedDiscount, setAppliedDiscount] = useState<{ code: string; promo: Promo } | null>(null);
   const [discountError, setDiscountError] = useState("");
 
   const cardRef = useRef<SquareCardMethod | null>(null);
@@ -72,15 +65,15 @@ export default function CheckoutPage() {
 
   // Display-only estimate — server computes the real total via Square,
   // which is whatever tax rate Ariel has configured in her Square account.
-  const shipping = subtotal >= 50 || subtotal === 0 ? 0 : 6;
-  const discountAmount = appliedDiscount ? subtotal * (appliedDiscount.pct / 100) : 0;
+  const shipping = shippingFor(subtotal, appliedDiscount?.promo);
+  const discountAmount =
+    appliedDiscount?.promo.kind === "percent" ? subtotal * (appliedDiscount.promo.value / 100) : 0;
   const estimatedTotal = subtotal - discountAmount + shipping;
 
   function handleApplyDiscount() {
-    const normalized = discountInput.trim().toUpperCase();
-    const pct = DISPLAY_DISCOUNT_CODES[normalized];
-    if (pct) {
-      setAppliedDiscount({ code: normalized, pct });
+    const found = findPromo(discountInput);
+    if (found) {
+      setAppliedDiscount(found);
       setDiscountError("");
     } else {
       setAppliedDiscount(null);
@@ -388,7 +381,7 @@ export default function CheckoutPage() {
           {discountError && <p className="mt-1 text-xs text-hibiscus">{discountError}</p>}
           {appliedDiscount && (
             <p className="mt-1 text-xs text-lagoon-deep">
-              {appliedDiscount.code} applied — {appliedDiscount.pct}% off
+              {appliedDiscount.code} applied — {appliedDiscount.promo.label}
             </p>
           )}
 
@@ -397,7 +390,7 @@ export default function CheckoutPage() {
               <span>Subtotal</span>
               <span>${subtotal.toFixed(2)}</span>
             </div>
-            {appliedDiscount && (
+            {appliedDiscount && appliedDiscount.promo.kind === "percent" && (
               <div className="flex justify-between text-lagoon-deep">
                 <span>Discount ({appliedDiscount.code})</span>
                 <span>-${discountAmount.toFixed(2)}</span>

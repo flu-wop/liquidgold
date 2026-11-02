@@ -43,7 +43,7 @@ export async function ensureSchema() {
   `);
   // Orders tables created before tracking columns existed — add if missing
   // rather than requiring a manual migration.
-  for (const col of ["tracking_number TEXT", "tracking_carrier TEXT", "shipped_at INTEGER"]) {
+  for (const col of ["tracking_number TEXT", "tracking_carrier TEXT", "shipped_at INTEGER", "label_url TEXT", "label_cost TEXT", "tracking_url TEXT"]) {
     try {
       await db.execute(`ALTER TABLE orders ADD COLUMN ${col}`);
     } catch {

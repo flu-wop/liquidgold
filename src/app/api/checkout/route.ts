@@ -7,17 +7,11 @@ import { getProduct } from "@/lib/products";
 import { getCustomProducts } from "@/lib/custom-products";
 import { sendOrderConfirmation } from "@/lib/resend";
 import { getAllCatalogVariationIds, getStockCounts } from "@/lib/square-catalog";
+import { findPromo, shippingFor } from "@/lib/promos";
 
 export const runtime = "nodejs";
 
 type CartLine = { handle: string; qty: number };
-
-// Server-side only — never trust a discount from the client. Codes are
-// case-insensitive on input, normalized to uppercase here.
-const DISCOUNT_CODES: Record<string, number> = {
-  ISLAND15: 15,
-  ISLAND20: 20,
-};
 
 function isValidEmail(s: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s) && s.length <= 200;
@@ -159,21 +153,14 @@ export async function POST(req: Request) {
           }
     );
   }
-  const shippingCents = subtotalCents >= 5000 ? 0 : 600;
-
-  // Discount — server-validated against the fixed map above, applied as a
-  // real Square order-level discount so it shows correctly in her Square
-  // dashboard and reporting, not just in our own records.
-  let appliedCode: string | null = null;
-  let discountPct = 0;
-  if (discountCode && typeof discountCode === "string") {
-    const normalized = discountCode.trim().toUpperCase();
-    const pct = DISCOUNT_CODES[normalized];
-    if (pct) {
-      appliedCode = normalized;
-      discountPct = pct;
-    }
-  }
+  // Promo — server-validated against src/lib/promos.ts, never trusting the
+  // client. Percent codes become a real Square order-level discount so they
+  // show in her Square dashboard; free-shipping codes simply drop the
+  // shipping service charge.
+  const found = findPromo(discountCode);
+  const appliedCode: string | null = found?.code ?? null;
+  const discountPct = found?.promo.kind === "percent" ? found.promo.value : 0;
+  const shippingCents = Math.round(shippingFor(subtotalCents / 100, found?.promo) * 100);
 
   const taxIds = await getEnabledSquareTaxIds();
 
@@ -200,12 +187,36 @@ export async function POST(req: Request) {
           amountMoney: { amount: BigInt(shippingCents), currency: "USD" },
           calculationPhase: "TOTAL_PHASE",
         }] : undefined,
-        discounts: appliedCode ? [{
+        discounts: appliedCode && discountPct > 0 ? [{
           uid: randomUUID(),
           name: appliedCode,
           percentage: String(discountPct),
           scope: "ORDER",
         }] : undefined,
+        // Ship-to details on the Square order itself, so name + address
+        // show up in the Square dashboard / app next to the items.
+        fulfillments: [{
+          type: "SHIPMENT",
+          state: "PROPOSED",
+          shipmentDetails: {
+            recipient: {
+              displayName: name,
+              emailAddress: email,
+              address: {
+                addressLine1: address,
+                // Square wants a 2-letter state code; the checkout field is
+                // free text, so anything longer goes in with the city
+                // instead of risking a rejected order.
+                locality: /^[A-Za-z]{2}$/.test(state.trim()) ? city : `${city}, ${state}`,
+                ...(/^[A-Za-z]{2}$/.test(state.trim())
+                  ? { administrativeDistrictLevel1: state.trim().toUpperCase() }
+                  : {}),
+                postalCode: zip,
+                country: "US",
+              },
+            },
+          },
+        }],
         taxes: taxIds.map((id) => ({
           uid: randomUUID(),
           catalogObjectId: id,

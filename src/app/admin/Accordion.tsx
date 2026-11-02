@@ -30,7 +30,7 @@ export default function Accordion({
         </span>
         <ChevronDown size={18} className="text-cocoa/50 transition-transform" style={{ transform: open ? "rotate(180deg)" : "none" }} aria-hidden />
       </button>
-      {open && <div className="px-4 sm:px-5 pb-5 border-t border-cocoa/10">{children}</div>}
+      {open && <div className="space-y-5 border-t border-cocoa/10 px-4 py-4 sm:px-5 sm:py-5">{children}</div>}
     </section>
   );
 }

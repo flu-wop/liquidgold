@@ -7,7 +7,7 @@ import WhyLiquidGold from "@/components/home/WhyLiquidGold";
 import Reviews from "@/components/home/Reviews";
 import JoinParadise from "@/components/home/JoinParadise";
 import BrandVideo from "@/components/home/BrandVideo";
-import SetsAndExtras from "@/components/home/SetsAndExtras";
+import GalleryMarquee from "@/components/home/GalleryMarquee";
 import { getContentMap, content } from "@/lib/content";
 import { getHiddenScentSlugs } from "@/lib/scent-visibility";
 
@@ -27,7 +27,7 @@ export default async function HomePage() {
       />
       <BestSellers hiddenSlugs={hiddenSlugs} />
       <BrandVideo />
-      <SetsAndExtras hiddenSlugs={hiddenSlugs} />
+      <GalleryMarquee />
       {/* cream -> cocoa */}
       <div className="bg-cream">
         <LiquidTrail tone="cocoa" />

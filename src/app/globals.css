@@ -89,3 +89,5 @@ body {
   outline: 2px solid var(--color-gold);
   outline-offset: 3px;
 }
+
+.marquee-reverse .marquee-track { animation-direction: reverse; }

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import LiquidTrail from "@/components/ui/LiquidTrail";
 
 const columns: { title: string; links: { href: string; label: string }[] }[] = [
@@ -43,8 +44,11 @@ export default function Footer() {
         <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-12">
           {/* Brand + newsletter nudge */}
           <div className="lg:col-span-4">
-            <Link href="/" className="font-display text-3xl font-semibold leading-none tracking-tight">
-              Liquid Gold <span className="italic text-gold-light">Skin Co.</span>
+            <Link href="/" className="flex items-center gap-3 font-display text-3xl font-semibold leading-none tracking-tight">
+              <Image src="/images/brand/logo-mark.png" alt="" width={249} height={304} className="h-12 w-auto" />
+              <span>
+                Liquid Gold <span className="italic text-gold-light">Skin Co.</span>
+              </span>
             </Link>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-cream/75">
               Small-batch, island-inspired body butters, oils, and perfume — made to leave your
@@ -97,7 +101,7 @@ export default function Footer() {
 
         {/* Promise strip */}
         <ul className="mx-auto mt-14 flex max-w-7xl flex-wrap gap-x-8 gap-y-2 border-t border-cream/10 pt-6 text-xs uppercase tracking-[0.15em] text-cream/60">
-          <li>Free shipping over $50</li>
+          <li>Free shipping over $75</li>
           <li>Small-batch, made fresh</li>
           <li>Secure checkout by Square</li>
           <li>Every order gives back</li>

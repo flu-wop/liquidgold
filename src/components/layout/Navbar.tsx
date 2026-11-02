@@ -3,6 +3,7 @@
 import { useReducedMotionSafe } from "@/components/motion/useReducedMotionSafe";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useAnimationControls } from "framer-motion";
 import { useCart } from "@/context/CartContext";
@@ -88,11 +89,22 @@ export default function Navbar() {
       >
         <Link
           href="/"
-          className={`font-display font-semibold tracking-tight text-cocoa transition-[font-size] duration-300 ${
-            scrolled ? "text-lg" : "text-xl"
+          aria-label="Liquid Gold Skin Co. — home"
+          className={`flex min-w-0 items-center gap-2 whitespace-nowrap font-display font-semibold tracking-tight text-cocoa transition-[font-size] duration-300 sm:gap-2.5 ${
+            scrolled ? "text-[15px] sm:text-lg" : "text-base sm:text-xl"
           }`}
         >
-          Liquid Gold <span className="text-gold-gradient italic">Skin Co.</span>
+          <Image
+            src="/images/brand/logo-mark.png"
+            alt=""
+            width={249}
+            height={304}
+            priority
+            className={`w-auto transition-[height] duration-300 ${scrolled ? "h-7 sm:h-8" : "h-8 sm:h-10"}`}
+          />
+          <span>
+            Liquid Gold <span className="text-gold-gradient hidden italic min-[430px]:inline">Skin Co.</span>
+          </span>
         </Link>
 
         <nav aria-label="Main" className="hidden gap-8 md:flex">
@@ -185,7 +197,7 @@ export default function Navbar() {
               transition={{ delay: reduce ? 0 : 0.4 }}
             >
               <p className="font-display text-lg italic text-cocoa">Your skin just went on vacation.</p>
-              <p className="mt-1">Free shipping over $50 · Small-batch, made fresh</p>
+              <p className="mt-1">Free shipping over $75 · Small-batch, made fresh</p>
             </motion.div>
           </motion.nav>
         )}
