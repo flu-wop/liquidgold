@@ -27,7 +27,19 @@ type Order = {
   label_url: string | null;
   label_cost: string | null;
   created_at: number;
+  shipped_at: number | null;
 };
+
+// Explicit zone + locale so server and browser render the same string
+// (the rest of admin uses Central time too).
+const ORDER_DATE = new Intl.DateTimeFormat("en-US", {
+  timeZone: "America/Chicago",
+  month: "short",
+  day: "numeric",
+  year: "numeric",
+  hour: "numeric",
+  minute: "2-digit",
+});
 
 function parseItems(json: string): OrderItem[] {
   try {
@@ -164,6 +176,20 @@ export default function OrdersList({ orders }: { orders: Order[] }) {
               </p>
               <p className="font-semibold text-cocoa">${(o.total_cents / 100).toFixed(2)}</p>
             </div>
+            <p className="-mt-2 text-xs text-cocoa/60">
+              Ordered{" "}
+              <time dateTime={new Date(o.created_at * 1000).toISOString()}>
+                {ORDER_DATE.format(new Date(o.created_at * 1000))} CT
+              </time>
+              {o.shipped_at ? (
+                <>
+                  {" "}· Shipped{" "}
+                  <time dateTime={new Date(o.shipped_at * 1000).toISOString()}>
+                    {ORDER_DATE.format(new Date(o.shipped_at * 1000))} CT
+                  </time>
+                </>
+              ) : null}
+            </p>
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
@@ -194,7 +220,12 @@ export default function OrdersList({ orders }: { orders: Order[] }) {
               {o.discount_code
                 ? ` · ${o.discount_code}${o.discount_cents > 0 ? ` -$${(o.discount_cents / 100).toFixed(2)}` : ""}`
                 : ""}
-              {" "}· Tax ${(o.tax_cents / 100).toFixed(2)}
+              {" "}·{" "}
+              {o.tax_cents === 0 && o.subtotal_cents > 0 ? (
+                <span className="font-semibold text-hibiscus">Tax $0.00 — no tax was collected</span>
+              ) : (
+                <>Tax ${(o.tax_cents / 100).toFixed(2)}</>
+              )}
               {" "}· Shipping {o.shipping_cents === 0 ? "free" : `$${(o.shipping_cents / 100).toFixed(2)}`}
             </p>
 

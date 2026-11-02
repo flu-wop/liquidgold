@@ -8,6 +8,7 @@ import { getCustomProducts } from "@/lib/custom-products";
 import { sendOrderConfirmation } from "@/lib/resend";
 import { getAllCatalogVariationIds, getStockCounts } from "@/lib/square-catalog";
 import { findPromo, shippingFor } from "@/lib/promos";
+import { getSquareTaxes, applicableTaxes, fallbackTax } from "@/lib/square-tax";
 
 export const runtime = "nodejs";
 
@@ -18,26 +19,25 @@ function isValidEmail(s: string) {
 }
 
 // ── Tax now lives in Square, not in this codebase. ──
-// Ariel (or James) sets this up once in Square Dashboard → Settings →
-// Business → Sales Tax, and can change the rate anytime with zero code
-// changes or redeploys. We just fetch whatever's currently enabled there
-// and apply it — same rate whether the sale happens online or in person,
-// since it's the same Square account either way. If nothing is configured
-// in Square, no tax is applied (fails safe to $0, not to a guessed rate).
-async function getEnabledSquareTaxIds(): Promise<string[]> {
-  const square = getSquare();
-  const ids: string[] = [];
+// Ariel (or James) sets this up once in Square Dashboard → Items → Taxes,
+// and can change the rate anytime with zero code changes or redeploys.
+// See src/lib/square-tax.ts for how a tax is judged applicable. If Square
+// has no applicable tax, an optional SALES_TAX_PERCENT env var is used as
+// a fallback, and either way a $0-tax order triggers an alert email so it
+// can't go unnoticed again.
+async function alertTaxProblem(orderId: string, detail: string) {
+  console.error(`[tax] ${orderId}: ${detail}`);
   try {
-    const pager = await square.catalog.list({ types: "TAX" });
-    for await (const obj of pager) {
-      if (obj.type === "TAX" && obj.taxData?.enabled) {
-        ids.push(obj.id!);
-      }
-    }
+    const { getResend } = await import("@/lib/resend");
+    await getResend().emails.send({
+      from: process.env.RESEND_FROM_EMAIL!,
+      to: process.env.RESEND_TO_EMAIL!,
+      subject: `⚠️ No sales tax collected — ${orderId}`,
+      text: `Order ${orderId} was charged WITHOUT sales tax.\n\n${detail}\n\nFix: Square Dashboard → Items → Taxes — make sure the tax is enabled and active at your site's location. Check /admin/system → "salesTax" for the current status.`,
+    });
   } catch (e) {
-    console.error("failed to fetch Square tax settings, proceeding with no tax", e);
+    console.error("tax alert email failed", e);
   }
-  return ids;
 }
 
 export async function POST(req: Request) {
@@ -162,7 +162,9 @@ export async function POST(req: Request) {
   const discountPct = found?.promo.kind === "percent" ? found.promo.value : 0;
   const shippingCents = Math.round(shippingFor(subtotalCents / 100, found?.promo) * 100);
 
-  const taxIds = await getEnabledSquareTaxIds();
+  const { taxes: squareTaxes, error: taxError } = await getSquareTaxes();
+  const taxApplied = applicableTaxes(squareTaxes);
+  const manualTax = taxApplied.length === 0 ? fallbackTax() : null;
 
   const orderId = `LG-${randomUUID().slice(0, 8).toUpperCase()}`;
   const square = getSquare();
@@ -217,11 +219,9 @@ export async function POST(req: Request) {
             },
           },
         }],
-        taxes: taxIds.map((id) => ({
-          uid: randomUUID(),
-          catalogObjectId: id,
-          scope: "ORDER",
-        })),
+        taxes: manualTax
+          ? [{ uid: randomUUID(), name: manualTax.name, percentage: manualTax.percentage, scope: "ORDER" as const }]
+          : taxApplied.map((t) => ({ uid: randomUUID(), catalogObjectId: t.id, scope: "ORDER" as const })),
       },
     });
     const order = orderResult.order;
@@ -232,6 +232,16 @@ export async function POST(req: Request) {
     orderTotalCents = Number(order.totalMoney.amount);
     discountCents = Number(order.totalDiscountMoney?.amount ?? 0);
     taxCents = Number(order.totalTaxMoney?.amount ?? 0);
+    if (taxCents === 0 && subtotalCents > 0) {
+      const why = taxError
+        ? `Couldn't read tax settings from Square: ${taxError}`
+        : squareTaxes.length === 0
+          ? "Square has no tax set up (Items → Taxes), and SALES_TAX_PERCENT isn't set."
+          : taxApplied.length === 0 && !manualTax
+            ? `Taxes found but none applied: ${squareTaxes.map((t) => `${t.name} ${t.percentage}% (${t.why})`).join("; ")}`
+            : "Square returned $0 tax even though a tax was attached — check the tax's settings in Square.";
+      void alertTaxProblem(orderId, why);
+    }
   } catch (err) {
     console.error("Square order creation failed", err);
     return NextResponse.json({ error: "Could not calculate order total. Please try again." }, { status: 500 });

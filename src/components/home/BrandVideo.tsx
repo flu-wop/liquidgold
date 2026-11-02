@@ -12,10 +12,8 @@ import Button from "@/components/ui/Button";
 // - muted + playsInline so iOS/Android allow inline autoplay.
 // - Reduced-motion users get the poster and a play button instead of
 //   autoplay; everyone gets a visible pause/play control (WCAG 2.2.2).
-//
-// TODO(assets): this cut is a slideshow built from Ariel's existing
-// product photography. Drop real footage in at the same paths (keep it
-// H.264 MP4, ~15–30s, under ~3 MB per file) and nothing else changes.
+// Footage: a ~20s cut of Ariel's own video. Portrait = center 9:16 crop
+// (608x1080), landscape = original 16:9 (1280x720); both silent H.264.
 const SOURCES = {
   portrait: {
     src: "/video/liquid-gold-ritual-portrait.mp4",

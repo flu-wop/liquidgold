@@ -3,6 +3,7 @@ import { getSquare } from "./square";
 import { Resend } from "resend";
 import { getAllCatalogVariationIds } from "./square-catalog";
 import { products } from "./products";
+import { getSquareTaxes, applicableTaxes, fallbackTax } from "./square-tax";
 
 export type CheckResult = { status: "ok" | "warn" | "error"; detail: string };
 
@@ -146,4 +147,23 @@ export async function checkProductSync(): Promise<CheckResult> {
   } catch (err) {
     return { status: "error", detail: `Sync check failed: ${(err as Error).message}` };
   }
+}
+
+// ---- 5. Sales tax ----
+// Does checkout have a tax it can actually apply? (Square taxes only count
+// if enabled AND active at this site's location.)
+export async function checkSalesTax(): Promise<CheckResult> {
+  const { taxes, error } = await getSquareTaxes();
+  if (error) return { status: "error", detail: `Couldn't read taxes from Square: ${error}` };
+  const live = applicableTaxes(taxes);
+  if (live.length > 0) {
+    return { status: "ok", detail: `Collecting ${live.map((t) => `${t.name} ${t.percentage}%`).join(" + ")}` };
+  }
+  const fb = fallbackTax();
+  if (fb) return { status: "warn", detail: `No usable tax in Square — using fallback ${fb.name} ${fb.percentage}% from SALES_TAX_PERCENT` };
+  if (taxes.length === 0) return { status: "error", detail: "NO TAX is being collected — nothing set up in Square (Items → Taxes)" };
+  return {
+    status: "error",
+    detail: `NO TAX is being collected — ${taxes.map((t) => `${t.name} ${t.percentage}% is ${t.why}`).join("; ")}`,
+  };
 }
