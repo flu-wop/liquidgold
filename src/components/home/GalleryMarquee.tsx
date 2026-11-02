@@ -1,6 +1,11 @@
 import Link from "next/link";
 import Image from "next/image";
 import Reveal from "@/components/motion/Reveal";
+import GalleryAddButton from "@/components/home/GalleryAddButton";
+import { getProduct, type Product } from "@/lib/products";
+import { formatPrice } from "@/components/ui/Price";
+
+type Entry = { src: string; handle: string; product: Product };
 
 // Immersive photo gallery: three stacked rows of tall rounded cards that
 // drift in alternating directions, with soft edge fades, a category chip
@@ -9,60 +14,69 @@ import Reveal from "@/components/motion/Reveal";
 // fully static under prefers-reduced-motion (rows become swipeable).
 // Layout pattern modelled on the gallery on chicagowaffles.com.
 
-type Shot = { src: string; chip: string; title: string; sub: string; href: string };
+// Products only: every card is a real, purchasable SKU (photo -> handle),
+// and can be added to the cart right from the gallery. Perfume and travel
+// kits join once they have real photography.
+type Shot = { src: string; handle: string };
 
 const P = "/images/products/";
-const shots: Shot[] = [
-  { src: `${P}hero-ritual.jpg`, chip: "The Ritual", title: "Your daily glow", sub: "Butter, oil, and an island state of mind", href: "/shop" },
-  { src: `${P}cocoa-cashmere-butter.jpg`, chip: "Body Butter", title: "Cocoa Cashmere", sub: "Warm, creamy, addictive", href: "/scents/cocoa-cashmere" },
-  { src: `${P}pink-fantasy-oil-2.jpg`, chip: "Body Oil", title: "Pink Fantasy", sub: "Pink sunsets and flirty island energy", href: "/scents/pink-fantasy" },
-  { src: `${P}juicy-paradise.jpg`, chip: "The Scents", title: "Juicy Paradise", sub: "Peach, guava, mango, papaya", href: "/scents/juicy-paradise" },
-  { src: `${P}bare-current-butter.jpg`, chip: "Body Butter", title: "Bare Current", sub: "Sea spray and sun-warmed skin", href: "/scents/bare-current" },
-  { src: `${P}unscented-butter-2.jpg`, chip: "The Ritual", title: "Unscented", sub: "Deep moisture, no fragrance", href: "/scents/unscented" },
-  { src: `${P}cocoa-cashmere-oil.jpg`, chip: "Body Oil", title: "Cocoa Cashmere", sub: "A featherweight glow", href: "/scents/cocoa-cashmere" },
-  { src: `${P}pink-fantasy.jpg`, chip: "The Scents", title: "Pink Fantasy", sub: "Butter + oil, island style", href: "/scents/pink-fantasy" },
-  { src: `${P}bare-current-oil.jpg`, chip: "Body Oil", title: "Bare Current", sub: "Fresh out of the ocean", href: "/scents/bare-current" },
-  { src: `${P}cocoa-cashmere-butter-2.jpg`, chip: "The Ritual", title: "Beach day, bottled", sub: "Whipped for 48 hours", href: "/shop#bundles" },
-  { src: `${P}unscented-oil.jpg`, chip: "Body Oil", title: "Unscented Body Oil", sub: "Simple, natural, gentle", href: "/scents/unscented" },
-  { src: `${P}cocoa-cashmere-oil-2.jpg`, chip: "The Ritual", title: "After the shower", sub: "Layer oil over butter", href: "/shop#bundles" },
+const SHOTS: Shot[] = [
+  { src: `${P}hero-ritual.jpg`, handle: "juicy-paradise-butter-8oz" },
+  { src: `${P}cocoa-cashmere-butter.jpg`, handle: "cocoa-cashmere-butter-8oz" },
+  { src: `${P}pink-fantasy-oil-2.jpg`, handle: "pink-fantasy-oil-8oz" },
+  { src: `${P}bundle-cocoa-cashmere.jpg`, handle: "cocoa-cashmere-bundle-8oz-8oz" },
+  { src: `${P}bare-current-butter.jpg`, handle: "bare-current-butter-8oz" },
+  { src: `${P}unscented-butter-2.jpg`, handle: "unscented-butter-8oz" },
+  { src: `${P}cocoa-cashmere-oil.jpg`, handle: "cocoa-cashmere-oil-8oz" },
+  { src: `${P}juicy-paradise.jpg`, handle: "juicy-paradise-bundle-8oz-8oz" },
+  { src: `${P}bare-current-oil.jpg`, handle: "bare-current-oil-8oz" },
+  { src: `${P}pink-fantasy.jpg`, handle: "pink-fantasy-bundle-8oz-8oz" },
+  { src: `${P}unscented-oil.jpg`, handle: "unscented-oil-8oz" },
+  { src: `${P}bundle-bare-current.jpg`, handle: "bare-current-bundle-8oz-8oz" },
 ];
+
+const entries = SHOTS.flatMap((s) => {
+  const product = getProduct(s.handle);
+  return product ? [{ ...s, product }] : [];
+});
 
 // Three rows, each starting at a different photo so neighbours never match.
 const rows = [
-  { items: shots, duration: 70, reverse: false },
-  { items: [...shots.slice(4), ...shots.slice(0, 4)], duration: 80, reverse: true },
-  { items: [...shots.slice(8), ...shots.slice(0, 8)], duration: 62, reverse: false },
+  { items: entries, duration: 70, reverse: false },
+  { items: [...entries.slice(4), ...entries.slice(0, 4)], duration: 80, reverse: true },
+  { items: [...entries.slice(8), ...entries.slice(0, 8)], duration: 62, reverse: false },
 ];
 
 const CARD =
   "relative h-[280px] w-[200px] overflow-hidden rounded-2xl sm:h-[320px] sm:w-[240px] sm:rounded-3xl lg:h-[380px] lg:w-[280px] xl:h-[420px] xl:w-[320px]";
 
-function Card({ shot, hidden }: { shot: Shot; hidden: boolean }) {
+function Card({ entry, hidden }: { entry: Entry; hidden: boolean }) {
+  const p = entry.product;
+  const title = p.name.split(" — ")[0];
   return (
-    <Link
-      href={shot.href}
-      aria-hidden={hidden || undefined}
-      tabIndex={hidden ? -1 : undefined}
-      className="group relative mx-2 flex-shrink-0 sm:mx-2.5 lg:mx-3"
-    >
+    <div className="group relative mx-2 flex-shrink-0 sm:mx-2.5 lg:mx-3" aria-hidden={hidden || undefined}>
       <div className={CARD}>
+        <Link href={`/products/${p.handle}`} tabIndex={hidden ? -1 : undefined} className="absolute inset-0 z-10" aria-label={`${title}, ${formatPrice(p.price)}`} />
         <Image
-          src={shot.src}
-          alt={hidden ? "" : `${shot.title} — ${shot.chip}`}
+          src={entry.src}
+          alt={hidden ? "" : title}
           fill
           sizes="(max-width: 640px) 200px, (max-width: 1024px) 240px, 320px"
           className="object-cover transition-transform duration-700 ease-out group-hover:scale-110 motion-reduce:transition-none"
         />
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-cocoa/80 via-cocoa/10 to-transparent opacity-50 transition-opacity duration-300 group-hover:opacity-90" />
-        <span className="absolute left-3 top-3 rounded-full bg-cream/90 px-3 py-1.5 text-xs font-medium text-cocoa backdrop-blur-sm sm:left-4 sm:top-4 lg:left-5 lg:top-5 lg:px-4 lg:py-2 lg:text-sm">
-          {shot.chip}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-cocoa/85 via-cocoa/10 to-transparent opacity-60 transition-opacity duration-300 group-hover:opacity-95" />
+        <span className="pointer-events-none absolute left-3 top-3 rounded-full bg-cream/90 px-3 py-1.5 text-xs font-medium text-cocoa backdrop-blur-sm sm:left-4 sm:top-4 lg:left-5 lg:top-5 lg:px-4 lg:py-2 lg:text-sm">
+          {p.type === "Bundle" ? "Bundle" : p.type}
         </span>
-        <div className="pointer-events-none absolute inset-x-4 bottom-4 translate-y-3 opacity-0 transition-[opacity,transform] duration-300 group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100 lg:inset-x-5 lg:bottom-5">
-          <p className="font-display text-xl text-cream lg:text-2xl">{shot.title}</p>
-          <p className="mt-0.5 text-sm text-cream/85">{shot.sub}</p>
+        <div className="pointer-events-none absolute bottom-3 left-3 right-16 sm:bottom-4 sm:left-4 lg:bottom-5 lg:left-5">
+          <p className="font-display text-lg leading-tight text-cream lg:text-xl">{title}</p>
+          <p className="mt-0.5 text-sm text-cream/85">
+            {p.size} · {formatPrice(p.price)}
+          </p>
         </div>
+        <GalleryAddButton product={p} decorative={hidden} />
       </div>
-    </Link>
+    </div>
   );
 }
 
@@ -75,14 +89,14 @@ export default function GalleryMarquee() {
       <Reveal className="mx-auto mb-10 max-w-3xl px-6 text-center md:mb-14">
         <div className="flex items-center justify-center gap-4">
           <span aria-hidden className="h-px w-10 bg-gradient-to-r from-transparent to-gold" />
-          <p className="text-sm font-semibold uppercase tracking-[0.25em] text-guava">The Gallery</p>
+          <p className="text-sm font-semibold uppercase tracking-[0.25em] text-guava">Shop the Gallery</p>
           <span aria-hidden className="h-px w-10 bg-gradient-to-l from-transparent to-gold" />
         </div>
         <h2 className="mt-5 font-display text-4xl leading-[0.95] text-cocoa md:text-6xl">
           Island <span className="text-gold-gradient italic">moments</span>
         </h2>
         <p className="mx-auto mt-4 max-w-xl text-cocoa/75 md:text-lg">
-          A glimpse into the Liquid Gold ritual — real jars, real skin, real sunshine.
+          Every photo is a real product. Tap + to add it straight to your cart.
         </p>
       </Reveal>
 
@@ -98,10 +112,10 @@ export default function GalleryMarquee() {
           >
             <div className="marquee-track flex w-max" style={{ animationDuration: `${row.duration}s` }}>
               {row.items.map((s, i) => (
-                <Card key={`a${i}`} shot={s} hidden={ri > 0} />
+                <Card key={`a${i}`} entry={s} hidden={ri > 0} />
               ))}
               {row.items.map((s, i) => (
-                <Card key={`b${i}`} shot={s} hidden />
+                <Card key={`b${i}`} entry={s} hidden />
               ))}
             </div>
           </div>
