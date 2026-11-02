@@ -107,7 +107,7 @@ export default function Navbar() {
           </span>
         </Link>
 
-        <nav aria-label="Main" className="hidden gap-8 md:flex">
+        <nav aria-label="Main" className="hidden gap-6 lg:flex xl:gap-8">
           {links.map((l) => {
             const active = pathname === l.href || pathname?.startsWith(`${l.href}/`);
             return (
@@ -148,7 +148,7 @@ export default function Navbar() {
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
             aria-controls="mobile-menu"
-            className="flex h-11 w-11 flex-col items-center justify-center gap-1.5 md:hidden"
+            className="flex h-11 w-11 flex-col items-center justify-center gap-1.5 lg:hidden"
           >
             <span className={`h-0.5 w-6 bg-cocoa transition-transform duration-300 ${open ? "translate-y-2 rotate-45" : ""}`} />
             <span className={`h-0.5 w-6 bg-cocoa transition-opacity duration-200 ${open ? "opacity-0" : ""}`} />
@@ -163,7 +163,7 @@ export default function Navbar() {
           <motion.nav
             id="mobile-menu"
             aria-label="Mobile"
-            className="fixed inset-x-0 bottom-0 z-40 flex flex-col overflow-y-auto bg-sand px-6 pb-10 pt-6 md:hidden"
+            className="fixed inset-x-0 bottom-0 z-40 flex flex-col overflow-y-auto bg-sand px-6 pb-10 pt-6 lg:hidden"
             style={{ top: menuTop }}
             initial={reduce ? { opacity: 0 } : { opacity: 0, y: -12 }}
             animate={{ opacity: 1, y: 0 }}
