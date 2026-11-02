@@ -35,7 +35,7 @@ export default function WholesaleForm() {
     return (
       <div className="mt-16 rounded-3xl bg-lagoon/10 p-8 text-center">
         <p className="font-display text-2xl text-cocoa">Application received</p>
-        <p className="mt-2 text-sm text-cocoa/60">We'll be in touch soon.</p>
+        <p className="mt-2 text-sm text-cocoa/70">We'll be in touch soon.</p>
       </div>
     );
   }
@@ -44,11 +44,11 @@ export default function WholesaleForm() {
     <div className="mt-16 rounded-3xl bg-lagoon/10 p-8">
       <h2 className="font-display text-2xl text-cocoa">Apply for Wholesale</h2>
       <form onSubmit={handleSubmit} className="mt-6 grid gap-4 md:grid-cols-2">
-        <input name="businessName" required maxLength={150} placeholder="Business name" className="rounded-xl border border-cocoa/20 bg-cream px-4 py-3 text-sm" />
-        <input name="email" type="email" required maxLength={200} placeholder="Email" className="rounded-xl border border-cocoa/20 bg-cream px-4 py-3 text-sm" />
-        <input name="businessType" maxLength={100} placeholder="Business type (salon, spa, boutique...)" className="rounded-xl border border-cocoa/20 bg-cream px-4 py-3 text-sm md:col-span-2" />
-        <textarea name="message" maxLength={2000} placeholder="Tell us about your business" rows={4} className="rounded-xl border border-cocoa/20 bg-cream px-4 py-3 text-sm md:col-span-2" />
-        {status === "error" && <p className="text-sm text-hibiscus md:col-span-2">{errorMsg}</p>}
+        <input name="businessName" aria-label="Business name" required maxLength={150} placeholder="Business name" className="rounded-xl border border-cocoa/20 bg-cream px-4 py-3 text-sm" />
+        <input name="email" type="email" aria-label="Email" autoComplete="email" required maxLength={200} placeholder="Email" className="rounded-xl border border-cocoa/20 bg-cream px-4 py-3 text-sm" />
+        <input name="businessType" aria-label="Business type" maxLength={100} placeholder="Business type (salon, spa, boutique...)" className="rounded-xl border border-cocoa/20 bg-cream px-4 py-3 text-sm md:col-span-2" />
+        <textarea name="message" aria-label="Tell us about your business" maxLength={2000} placeholder="Tell us about your business" rows={4} className="rounded-xl border border-cocoa/20 bg-cream px-4 py-3 text-sm md:col-span-2" />
+        {status === "error" && <p className="text-sm text-guava-deep md:col-span-2">{errorMsg}</p>}
         <Button type="submit" className="w-fit md:col-span-2">
           {status === "sending" ? "Sending…" : "Submit Application"}
         </Button>

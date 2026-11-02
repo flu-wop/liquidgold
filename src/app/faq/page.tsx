@@ -7,6 +7,13 @@ const faqs = [
   { q: "How long do products last once opened?", a: "[Placeholder.]" },
 ];
 
+export const metadata = {
+  title: "FAQ",
+  description: "Answers to common questions about Liquid Gold Skin Co. — shipping, ingredients, returns and wholesale.",
+  // Most answers are still placeholders — keep out of search until written.
+  robots: { index: false, follow: true },
+};
+
 export default function FaqPage() {
   return (
     <section className="mx-auto max-w-3xl px-6 py-20">
@@ -17,7 +24,7 @@ export default function FaqPage() {
         {faqs.map((f) => (
           <div key={f.q} className="py-6">
             <p className="font-display text-lg text-cocoa">{f.q}</p>
-            <p className="mt-2 text-sm text-cocoa/60">{f.a}</p>
+            <p className="mt-2 text-sm text-cocoa/70">{f.a}</p>
           </div>
         ))}
       </div>

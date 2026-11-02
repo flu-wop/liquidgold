@@ -11,6 +11,19 @@ import Reveal from "@/components/motion/Reveal";
 
 export const dynamic = "force-dynamic";
 
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const scent = getScent(slug);
+  if (!scent) return { title: "Scent not found" };
+  const description = `${scent.name} — ${scent.story} Shop body butter, body oil, bundles${scent.availableIn.includes("Perfume") ? ", perfume and travel kits" : ""}.`;
+  return {
+    title: `${scent.name} Body Butter & Body Oil`,
+    description,
+    alternates: { canonical: `/scents/${scent.slug}` },
+    openGraph: { title: `${scent.name} | Liquid Gold Skin Co.`, description, images: [{ url: scent.image, alt: scent.name }] },
+  };
+}
+
 export default async function ScentDestinationPage({
   params,
 }: {

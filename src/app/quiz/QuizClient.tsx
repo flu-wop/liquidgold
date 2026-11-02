@@ -34,7 +34,7 @@ export default function QuizClient() {
 
   return (
     <section className="mx-auto max-w-2xl px-6 py-24 text-center">
-      <p className="text-xs font-semibold uppercase tracking-widest text-guava">
+      <p className="text-xs font-semibold uppercase tracking-widest text-guava-deep">
         Question {step + 1} of {quizQuestions.length}
       </p>
       <h1 className="mt-4 font-display text-3xl text-cocoa md:text-4xl">

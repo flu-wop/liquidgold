@@ -17,7 +17,7 @@ export default function JoinParadise({
         <div aria-hidden className="blob absolute -right-24 -top-24 h-64 w-64 bg-gold/20 blur-2xl" />
         <div aria-hidden className="blob absolute -bottom-28 -left-20 h-72 w-72 bg-lagoon/15 blur-2xl" />
         <div className="relative">
-          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-guava">Newsletter</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-guava-deep">Newsletter</p>
           <h2 className="mt-4 font-display text-4xl leading-[0.95] text-cocoa md:text-6xl">
             {headline}
           </h2>
@@ -31,11 +31,11 @@ export default function JoinParadise({
               type="email"
               autoComplete="email"
               placeholder="you@email.com"
-              className="min-h-[48px] w-full rounded-full border border-cocoa/20 bg-cream px-5 py-3 text-base text-cocoa outline-none transition-colors placeholder:text-cocoa/40 focus:border-guava sm:text-sm"
+              className="min-h-[48px] w-full rounded-full border border-cocoa/20 bg-cream px-5 py-3 text-base text-cocoa outline-none transition-colors placeholder:text-cocoa/70 focus:border-guava sm:text-sm"
             />
             <button
               type="submit"
-              className="min-h-[48px] whitespace-nowrap rounded-full bg-guava px-7 py-3 text-sm font-semibold text-cream transition-[background-color,transform] duration-200 hover:bg-hibiscus active:scale-[0.98] motion-reduce:active:scale-100"
+              className="min-h-[48px] whitespace-nowrap rounded-full bg-guava-deep px-7 py-3 text-sm font-semibold text-cream transition-[background-color,transform] duration-200 hover:bg-guava-ink active:scale-[0.98] motion-reduce:active:scale-100"
             >
               Join Paradise
             </button>

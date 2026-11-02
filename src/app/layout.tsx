@@ -24,9 +24,22 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: "Liquid Gold Skin Co. | Your Skin Just Went On Vacation",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://www.liquidgoldskinco.com"),
+  title: {
+    default: "Liquid Gold Skin Co. | Your Skin Just Went On Vacation",
+    template: "%s | Liquid Gold Skin Co.",
+  },
   description:
     "Island-inspired body care made to leave your skin soft, glowing, and impossible to forget.",
+  openGraph: {
+    type: "website",
+    siteName: "Liquid Gold Skin Co.",
+    title: "Liquid Gold Skin Co. | Your Skin Just Went On Vacation",
+    description:
+      "Island-inspired body butters, oils, perfume and travel kits — small-batch and made fresh.",
+    images: [{ url: "/images/products/hero-ritual.jpg", alt: "Liquid Gold Skin Co. body care" }],
+  },
+  twitter: { card: "summary_large_image" },
 };
 
 export default function RootLayout({

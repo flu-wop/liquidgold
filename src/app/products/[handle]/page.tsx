@@ -11,6 +11,24 @@ import ProductDetailClient from "./ProductDetailClient";
 // reasoning as the homepage.
 export const dynamic = "force-dynamic";
 
+async function findProduct(handle: string) {
+  return getProduct(handle) ?? (await getCustomProducts({ includeInactive: false })).find((p) => p.handle === handle);
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ handle: string }> }) {
+  const { handle } = await params;
+  const product = await findProduct(handle);
+  if (!product) return { title: "Product not found" };
+  const name = product.name.split(" — ")[0];
+  const description = `${name} (${product.size}) — $${product.price.toFixed(2)}. ${product.description}`.slice(0, 300);
+  return {
+    title: name,
+    description,
+    alternates: { canonical: `/products/${product.handle}` },
+    openGraph: { title: name, description, images: [{ url: product.image, alt: name }] },
+  };
+}
+
 export default async function ProductPage({
   params,
 }: {
@@ -44,8 +62,31 @@ export default async function ProductPage({
     bodyOil: content(contentMap, "product.bodyOil.description"),
   };
 
+  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://www.liquidgoldskinco.com").replace(/\/$/, "");
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name.split(" — ")[0],
+    description: product.description,
+    sku: product.handle,
+    image: `${siteUrl}${product.image}`,
+    brand: { "@type": "Brand", name: "Liquid Gold Skin Co." },
+    offers: {
+      "@type": "Offer",
+      url: `${siteUrl}/products/${product.handle}`,
+      priceCurrency: "USD",
+      price: product.price.toFixed(2),
+      availability: product.inStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+    },
+  };
+
   return (
     <section className="mx-auto max-w-7xl px-6 py-16">
+      <script
+        type="application/ld+json"
+        // escape "<" so product copy can never close the script tag
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
+      />
       <ProductDetailClient initial={product} scent={scent} descriptions={descriptions} isCustom={isCustom} />
     </section>
   );

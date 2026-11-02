@@ -53,7 +53,7 @@ export default function ProductCard({
           {product.name.split(" — ")[0]}
         </span>
       </p>
-      <p className="mt-0.5 text-xs uppercase tracking-wide text-cocoa/60 md:text-sm">
+      <p className="mt-0.5 text-xs uppercase tracking-wide text-cocoa/70 md:text-sm">
         {product.type} · {product.size}
       </p>
       <Price price={product.price} compareAt={product.compareAtPrice} className="mt-1" />

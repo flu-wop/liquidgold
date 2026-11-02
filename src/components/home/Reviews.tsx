@@ -48,7 +48,7 @@ export default function Reviews({ founderImage }: { founderImage: string }) {
       {/* Founder note — the founder image is her signature, so it signs the note */}
       <section className="bg-sand px-4 py-20 sm:px-6 md:py-28">
         <Reveal className="mx-auto max-w-3xl text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-guava">A note from the founder</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-guava-deep">A note from the founder</p>
           <p className="mt-6 font-display text-3xl leading-[1.15] text-cocoa md:text-5xl">
             &ldquo;This brand is more than skin deep to me.{" "}
             <span className="text-gold-gradient italic">It&rsquo;s family deep.</span>&rdquo;
@@ -66,7 +66,7 @@ export default function Reviews({ founderImage }: { founderImage: string }) {
               className="object-contain"
             />
           </div>
-          <p className="mt-2 text-sm uppercase tracking-[0.2em] text-cocoa/60">Ariel Salgado, founder</p>
+          <p className="mt-2 text-sm uppercase tracking-[0.2em] text-cocoa/70">Ariel Salgado, founder</p>
           <Link
             href="/about"
             className="group mt-8 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-widest text-cocoa"

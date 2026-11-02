@@ -37,6 +37,11 @@ const COLLECTIONS: { id: string; type: string; title: string; accent: string; bl
 // Stock counts must be fetched fresh on every request, not baked in at
 // build time — otherwise every visitor would see whatever stock existed
 // when the site was last deployed.
+export const metadata = {
+  title: "Shop Body Butter, Body Oil, Bundles & Perfume",
+  description: "Island-inspired body butters, body oils, Butter + Oil bundles, 10 mL perfume and travel kits. Small-batch, made fresh. Free shipping over $75.",
+};
+
 export const dynamic = "force-dynamic";
 
 export default async function ShopPage() {
@@ -60,7 +65,7 @@ export default async function ShopPage() {
   return (
     <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 md:py-20">
       <Reveal>
-        <p className="text-xs font-semibold uppercase tracking-[0.25em] text-guava">The Collection</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.25em] text-guava-deep">The Collection</p>
         <h1 className="mt-3 font-display text-5xl leading-[0.95] text-cocoa md:text-7xl">
           Shop the <span className="text-gold-gradient italic">Escape</span>
         </h1>

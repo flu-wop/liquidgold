@@ -1,6 +1,11 @@
 import Image from "next/image";
 import { getContentMap, content } from "@/lib/content";
 
+export const metadata = {
+  title: "Our Story",
+  description: "The story behind Liquid Gold Skin Co. — founded by Ariel Salgado on clean, affordable, small-batch body care.",
+};
+
 export const dynamic = "force-dynamic";
 
 export default async function AboutPage() {
@@ -14,7 +19,7 @@ export default async function AboutPage() {
       <h1 className="font-display text-4xl text-cocoa md:text-5xl">
         My <span className="text-gold-gradient italic">Story</span>
       </h1>
-      <p className="mt-4 font-display text-lg italic text-cocoa/60">
+      <p className="mt-4 font-display text-lg italic text-cocoa/70">
         More than Skin Deep
       </p>
 
@@ -39,7 +44,7 @@ export default async function AboutPage() {
         <h2 className="font-display text-3xl text-cocoa md:text-4xl">
           Our <span className="text-gold-gradient italic">Mission</span>
         </h2>
-        <p className="mt-2 font-display text-sm font-semibold uppercase tracking-widest text-guava">
+        <p className="mt-2 font-display text-sm font-semibold uppercase tracking-widest text-guava-deep">
           Affordable. Clean. Beauty.
         </p>
         <div className="mt-6 space-y-6 text-lg leading-relaxed text-cocoa/70">

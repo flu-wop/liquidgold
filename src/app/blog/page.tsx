@@ -1,6 +1,13 @@
 import Link from "next/link";
 import { posts } from "@/lib/blog";
 
+export const metadata = {
+  title: "Journal",
+  description: "Skincare tips, ingredient stories and island inspiration from Liquid Gold Skin Co.",
+  // Posts are placeholders for now — keep them out of search until real articles are written.
+  robots: { index: false, follow: true },
+};
+
 export default function BlogIndexPage() {
   return (
     <section className="mx-auto max-w-4xl px-6 py-20">
@@ -10,11 +17,11 @@ export default function BlogIndexPage() {
       <div className="mt-12 space-y-10">
         {posts.map((p) => (
           <Link key={p.slug} href={`/blog/${p.slug}`} className="block border-b border-cocoa/10 pb-10">
-            <p className="text-xs font-semibold uppercase tracking-widest text-guava">
+            <p className="text-xs font-semibold uppercase tracking-widest text-guava-deep">
               {p.category}
             </p>
             <p className="mt-2 font-display text-2xl text-cocoa">{p.title}</p>
-            <p className="mt-2 text-cocoa/60">{p.excerpt}</p>
+            <p className="mt-2 text-cocoa/70">{p.excerpt}</p>
           </Link>
         ))}
       </div>

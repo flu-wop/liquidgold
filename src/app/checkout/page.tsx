@@ -317,7 +317,7 @@ export default function CheckoutPage() {
             <div id="cash-app-pay-button" onClick={() => handleWalletPay(cashAppRef.current, "Cash App Pay")} className="h-11 w-full cursor-pointer overflow-hidden rounded-xl" />
           </div>
           {anyWalletAvailable && (
-            <div className="flex items-center gap-3 text-xs text-cocoa/40">
+            <div className="flex items-center gap-3 text-xs text-cocoa/70">
               <div className="h-px flex-1 bg-cocoa/10" />
               or pay with card
               <div className="h-px flex-1 bg-cocoa/10" />
@@ -328,14 +328,14 @@ export default function CheckoutPage() {
           {/* Square's SDK renders the actual card fields into this div —
               we never see or handle the raw card number ourselves. */}
           <div id="square-card-container" className="rounded-xl border border-cocoa/20 bg-cream p-4" />
-          {!sdkReady && <p className="text-xs text-cocoa/40">Loading secure payment form…</p>}
+          {!sdkReady && <p className="text-xs text-cocoa/70">Loading secure payment form…</p>}
 
-          {error && <p className="text-sm text-hibiscus">{error}</p>}
+          {error && <p className="text-sm text-guava-deep">{error}</p>}
 
           <button
             type="submit"
             disabled={processing || !sdkReady}
-            className="mt-6 w-full rounded-full bg-guava px-7 py-4 font-body text-sm font-semibold text-cream transition-colors hover:bg-hibiscus disabled:opacity-60"
+            className="mt-6 w-full rounded-full bg-guava-deep px-7 py-4 font-body text-sm font-semibold text-cream transition-colors hover:bg-guava-ink disabled:opacity-60"
           >
             {processing ? "Processing…" : `Place Order — $${estimatedTotal.toFixed(2)}`}
           </button>
@@ -351,7 +351,7 @@ export default function CheckoutPage() {
                 </div>
                 <div className="flex-1">
                   <p className="text-sm font-medium text-cocoa">{item.name}</p>
-                  <p className="text-xs text-cocoa/50">
+                  <p className="text-xs text-cocoa/70">
                     {item.type} · {item.size} · Qty {item.qty}
                   </p>
                 </div>
@@ -378,7 +378,7 @@ export default function CheckoutPage() {
               Apply
             </button>
           </div>
-          {discountError && <p className="mt-1 text-xs text-hibiscus">{discountError}</p>}
+          {discountError && <p className="mt-1 text-xs text-guava-deep">{discountError}</p>}
           {appliedDiscount && (
             <p className="mt-1 text-xs text-lagoon-deep">
               {appliedDiscount.code} applied — {appliedDiscount.promo.label}
@@ -400,7 +400,7 @@ export default function CheckoutPage() {
               <span>Shipping</span>
               <span>{shipping === 0 ? "Free" : `$${shipping.toFixed(2)}`}</span>
             </div>
-            <p className="text-xs italic text-cocoa/40">
+            <p className="text-xs italic text-cocoa/70">
               Tax is calculated by Square at payment and shown on the next step.
             </p>
             <div className="flex justify-between border-t border-cocoa/10 pt-2 font-semibold text-cocoa">

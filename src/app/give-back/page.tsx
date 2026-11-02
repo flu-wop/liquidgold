@@ -36,10 +36,15 @@ const charities = [
   },
 ];
 
+export const metadata = {
+  title: "Give Back",
+  description: "For every order, Liquid Gold Skin Co. donates $1 to one of our partner charities.",
+};
+
 export default function GiveBackPage() {
   return (
     <section className="mx-auto max-w-3xl px-6 py-20">
-      <p className="font-display text-sm font-semibold uppercase tracking-widest text-guava">
+      <p className="font-display text-sm font-semibold uppercase tracking-widest text-guava-deep">
         Buy a Jar. Give $1. Share the Glow.
       </p>
       <h1 className="mt-2 font-display text-4xl text-cocoa md:text-5xl">
@@ -80,7 +85,7 @@ export default function GiveBackPage() {
               <p className="mt-2 font-display text-lg text-cocoa">
                 {s.title}
               </p>
-              <p className="mt-1 text-sm text-cocoa/60">{s.body}</p>
+              <p className="mt-1 text-sm text-cocoa/70">{s.body}</p>
             </div>
           ))}
         </div>
@@ -95,23 +100,23 @@ export default function GiveBackPage() {
           incredible work in both direct care and long-term advocacy. Each
           year we choose one or two charities to receive our donations.
         </p>
-        <p className="mt-2 text-sm font-semibold text-cocoa/50">
+        <p className="mt-2 text-sm font-semibold text-cocoa/70">
           Potential partners include:
         </p>
         <ul className="mt-4 space-y-4">
           {charities.map((c) => (
             <li key={c.name} className="border-b border-cocoa/10 pb-4">
               <p className="font-display text-cocoa">{c.name}</p>
-              <p className="mt-1 text-sm text-cocoa/60">{c.body}</p>
+              <p className="mt-1 text-sm text-cocoa/70">{c.body}</p>
             </li>
           ))}
         </ul>
-        <p className="mt-6 text-sm text-cocoa/60">
+        <p className="mt-6 text-sm text-cocoa/70">
           If there are any charities or foundations you&rsquo;d love to see
           us support, please contact us at{" "}
           <a
             href="mailto:liquidgoldskinco@gmail.com"
-            className="text-guava underline underline-offset-2"
+            className="text-guava-deep underline underline-offset-2"
           >
             liquidgoldskinco@gmail.com
           </a>

@@ -32,7 +32,7 @@ export default function Hero({ headline, subheadline, image }: HeroProps) {
         <div className="relative z-10 mx-auto -mt-20 max-w-7xl px-5 pb-14 sm:-mt-28 sm:px-6 md:mt-0 md:flex md:min-h-[calc(100svh-4.5rem)] md:items-center md:py-24">
           <div className="md:max-w-[44rem]">
             <HeroFade delay={0.05}>
-              <span className="mb-5 inline-block text-xs font-semibold uppercase tracking-[0.25em] text-guava">
+              <span className="mb-5 inline-block text-xs font-semibold uppercase tracking-[0.25em] text-guava-deep">
                 Island-Inspired Body Care
               </span>
             </HeroFade>

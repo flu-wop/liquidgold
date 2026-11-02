@@ -146,7 +146,7 @@ export default function GalleryMarquee() {
       <Reveal className="mx-auto mb-10 max-w-3xl px-6 text-center md:mb-14">
         <div className="flex items-center justify-center gap-4">
           <span aria-hidden className="h-px w-10 bg-gradient-to-r from-transparent to-gold" />
-          <p className="text-sm font-semibold uppercase tracking-[0.25em] text-guava">The Gallery</p>
+          <p className="text-sm font-semibold uppercase tracking-[0.25em] text-guava-deep">The Gallery</p>
           <span aria-hidden className="h-px w-10 bg-gradient-to-l from-transparent to-gold" />
         </div>
         <h2 className="mt-5 font-display text-4xl leading-[0.95] text-cocoa md:text-6xl">

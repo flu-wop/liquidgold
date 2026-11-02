@@ -4,6 +4,11 @@ import { scents } from "@/lib/scents";
 import { RevealGroup, RevealItem } from "@/components/motion/Reveal";
 import { getHiddenScentSlugs } from "@/lib/scent-visibility";
 
+export const metadata = {
+  title: "Shop by Scent",
+  description: "Cocoa Cashmere, Juicy Paradise, Bare Current, Pink Fantasy and Unscented — find the Liquid Gold scent that matches your mood.",
+};
+
 export const dynamic = "force-dynamic";
 
 export default async function ScentsIndexPage() {
@@ -35,7 +40,7 @@ export default async function ScentsIndexPage() {
               </span>
               <span aria-hidden className="absolute inset-x-0 bottom-0 h-1" style={{ background: s.accent }} />
             </div>
-            <p className="mt-4 text-xs font-semibold uppercase tracking-widest text-cocoa/60">
+            <p className="mt-4 text-xs font-semibold uppercase tracking-widest text-cocoa/70">
               {s.mood}
             </p>
             <p className="font-display text-2xl italic text-cocoa">{s.name}</p>

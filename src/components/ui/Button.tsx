@@ -11,8 +11,8 @@ type ButtonProps = {
 };
 
 const variants = {
-  primary: "bg-guava text-cream hover:bg-hibiscus",
-  secondary: "bg-lagoon text-cream hover:bg-lagoon-deep",
+  primary: "bg-guava-deep text-cream hover:bg-guava-ink",
+  secondary: "bg-lagoon-deep text-cream hover:bg-cocoa",
   ghost: "bg-transparent text-cocoa border border-cocoa/30 hover:border-cocoa",
 };
 

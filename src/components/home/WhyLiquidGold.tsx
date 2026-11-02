@@ -29,7 +29,7 @@ export default function WhyLiquidGold() {
           <RevealGroup className="mt-10 grid gap-x-10 gap-y-10 sm:grid-cols-2" stagger={0.1}>
             {benefits.map((b, i) => (
               <RevealItem key={b.title} className="border-t border-cocoa/15 pt-5">
-                <p className="font-display text-5xl font-light italic leading-none text-gold md:text-6xl">
+                <p className="font-display text-5xl font-light italic leading-none text-[#9C6B14] md:text-6xl">
                   {String(i + 1).padStart(2, "0")}
                 </p>
                 <p className="mt-4 font-display text-2xl text-cocoa">{b.title}</p>

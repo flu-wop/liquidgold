@@ -15,7 +15,7 @@ export default function SuccessClient() {
 
   return (
     <section className="mx-auto max-w-lg px-6 py-32 text-center">
-      <p className="text-xs font-semibold uppercase tracking-widest text-lagoon">
+      <p className="text-xs font-semibold uppercase tracking-widest text-lagoon-deep">
         Order Confirmed
       </p>
       <h1 className="mt-4 font-display text-5xl italic text-cocoa">

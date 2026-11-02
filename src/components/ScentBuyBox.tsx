@@ -82,7 +82,8 @@ export default function ScentBuyBox({
       </div>
 
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.25em]" style={{ color: scent.accent }}>
+        <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.25em] text-guava-deep">
+          <span aria-hidden className="h-2 w-2 rounded-full" style={{ background: scent.accent }} />
           Step 1 · Choose your format
         </p>
         <div role="radiogroup" aria-label="Format" className="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-3">
@@ -103,7 +104,7 @@ export default function ScentBuyBox({
                 }`}
               >
                 <span className="block text-sm font-semibold leading-tight">{FORMAT_LABEL[t] ?? t}</span>
-                <span className={`mt-1 block text-xs ${sel ? "text-cream/75" : "text-cocoa/60"}`}>
+                <span className={`mt-1 block text-xs ${sel ? "text-cream/75" : "text-cocoa/70"}`}>
                   from ${from.toFixed(2)}
                 </span>
               </button>
@@ -113,7 +114,7 @@ export default function ScentBuyBox({
 
         {sizes.length > 1 && (
           <div className="mt-6">
-            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-cocoa/60">Step 2 · Size</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-cocoa/70">Step 2 · Size</p>
             <div role="radiogroup" aria-label="Size" className="mt-3 flex flex-wrap gap-2">
               {sizes.map((p) => (
                 <button
@@ -124,7 +125,7 @@ export default function ScentBuyBox({
                   onClick={() => setSize(p.size)}
                   className={`min-h-[44px] rounded-full border px-5 text-sm font-medium transition-colors ${
                     p.size === active.size
-                      ? "border-guava bg-guava text-cream"
+                      ? "border-guava bg-guava-deep text-cream"
                       : "border-cocoa/20 text-cocoa/70 hover:border-guava/60"
                   }`}
                 >
@@ -137,7 +138,7 @@ export default function ScentBuyBox({
 
         <div className="mt-8 border-t border-cocoa/10 pt-6">
           <p className="font-display text-2xl leading-tight text-cocoa">{active.name.split(" — ")[0]}</p>
-          <p className="mt-0.5 text-sm text-cocoa/60">{active.size}</p>
+          <p className="mt-0.5 text-sm text-cocoa/70">{active.size}</p>
           <Price price={active.price} compareAt={active.compareAtPrice} size="lg" className="mt-3" />
 
           {active.includes && (
@@ -156,7 +157,7 @@ export default function ScentBuyBox({
               type="button"
               onClick={add}
               disabled={soldOut}
-              className="inline-flex min-h-[52px] flex-1 items-center justify-center rounded-full bg-guava px-8 text-sm font-semibold tracking-wide text-cream transition-[background-color,transform] duration-200 hover:bg-hibiscus active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 motion-reduce:active:scale-100"
+              className="inline-flex min-h-[52px] flex-1 items-center justify-center rounded-full bg-guava-deep px-8 text-sm font-semibold tracking-wide text-cream transition-[background-color,transform] duration-200 hover:bg-guava-ink active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 motion-reduce:active:scale-100"
             >
               {soldOut ? "Sold out" : added ? "Added to cart ✓" : "Add to cart"}
             </button>
@@ -167,7 +168,7 @@ export default function ScentBuyBox({
               Full details
             </Link>
           </div>
-          <p className="mt-3 text-sm text-cocoa/60" aria-live="polite">
+          <p className="mt-3 text-sm text-cocoa/70" aria-live="polite">
             {added ? "In your cart — keep shopping or check out anytime." : "Free shipping over $75 · Small-batch, made fresh"}
           </p>
         </div>

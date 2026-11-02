@@ -13,6 +13,10 @@ const config: Config = {
         "lagoon-deep": "#0F6B65",
         guava: "#FF6F52",      // tropical fruit coral — secondary accent
         "guava-light": "#FF9478",
+        // Darker coral for TEXT and filled buttons: guava (#FF6F52) is only 2.4:1
+        // on sand; this is 4.7:1 (5.1:1 with cream text on it) — passes WCAG AA.
+        "guava-deep": "#C23A20",
+        "guava-ink": "#9E2D16",
         gold: "#D9A441",       // "Liquid Gold" — the brand's namesake accent
         "gold-light": "#E8C06B",
         hibiscus: "#F0487A",   // sparing use only — CTAs, badges, never backgrounds

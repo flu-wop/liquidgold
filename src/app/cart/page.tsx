@@ -12,7 +12,7 @@ export default function CartPage() {
     return (
       <section className="mx-auto max-w-2xl px-6 py-24 text-center">
         <h1 className="font-display text-4xl text-cocoa">Your cart is empty</h1>
-        <p className="mt-3 text-cocoa/60">
+        <p className="mt-3 text-cocoa/70">
           Time to find your island escape.
         </p>
         <div className="mt-8">
@@ -36,7 +36,7 @@ export default function CartPage() {
             </div>
             <div className="min-w-0 flex-1">
               <p className="font-display text-lg leading-tight text-cocoa">{item.name}</p>
-              <p className="text-sm text-cocoa/50">
+              <p className="text-sm text-cocoa/70">
                 {item.type} · {item.size}
               </p>
               <div className="mt-2 flex items-center gap-3">
@@ -57,7 +57,7 @@ export default function CartPage() {
                 </button>
                 <button
                   onClick={() => removeItem(item.handle)}
-                  className="ml-1 min-h-[36px] px-2 text-xs uppercase tracking-wide text-cocoa/60 hover:text-hibiscus"
+                  className="ml-1 min-h-[36px] px-2 text-xs uppercase tracking-wide text-cocoa/70 hover:text-hibiscus"
                 >
                   Remove
                 </button>
@@ -72,7 +72,7 @@ export default function CartPage() {
         <p className="text-lg text-cocoa/70">Subtotal</p>
         <p className="font-display text-2xl text-cocoa">${subtotal.toFixed(2)}</p>
       </div>
-      <p className="mt-1 text-right text-xs text-cocoa/40">
+      <p className="mt-1 text-right text-xs text-cocoa/70">
         Shipping and taxes calculated at checkout
       </p>
 
@@ -82,7 +82,7 @@ export default function CartPage() {
         </Button>
         <Link
           href="/checkout"
-          className="inline-flex min-h-[44px] items-center justify-center rounded-full bg-guava px-7 py-3 font-body text-sm font-semibold text-cream transition-[background-color,transform] duration-200 hover:bg-hibiscus active:scale-[0.98] motion-reduce:active:scale-100"
+          className="inline-flex min-h-[44px] items-center justify-center rounded-full bg-guava-deep px-7 py-3 font-body text-sm font-semibold text-cream transition-[background-color,transform] duration-200 hover:bg-guava-ink active:scale-[0.98] motion-reduce:active:scale-100"
         >
           Checkout
         </Link>

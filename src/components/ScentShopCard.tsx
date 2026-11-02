@@ -58,7 +58,10 @@ export default function ScentShopCard({ scent, stock = {} }: { scent: Scent; sto
         </div>
       </Link>
       <p className="mt-4 font-display text-xl leading-tight text-cocoa md:text-2xl">{scent.name}</p>
-      <p className="mt-0.5 text-xs uppercase tracking-[0.18em]" style={{ color: scent.accent }}>{scent.mood}</p>
+      <p className="mt-0.5 flex items-center gap-1.5 text-xs uppercase tracking-[0.18em] text-cocoa/70">
+        <span aria-hidden className="h-2 w-2 rounded-full" style={{ background: scent.accent }} />
+        {scent.mood}
+      </p>
 
       {/* Variant selectors — type first, then size */}
       <div className="mt-3 flex flex-wrap gap-1.5">
@@ -70,7 +73,7 @@ export default function ScentShopCard({ scent, stock = {} }: { scent: Scent; sto
             className={`min-h-[32px] rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
               type === t
                 ? "border-cocoa bg-cocoa text-cream"
-                : "border-cocoa/20 text-cocoa/60 hover:border-cocoa/50"
+                : "border-cocoa/20 text-cocoa/70 hover:border-cocoa/50"
             }`}
           >
             {t}
@@ -86,8 +89,8 @@ export default function ScentShopCard({ scent, stock = {} }: { scent: Scent; sto
               aria-pressed={size === v.size}
               className={`min-h-[32px] rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
                 size === v.size
-                  ? "border-guava bg-guava text-cream"
-                  : "border-cocoa/20 text-cocoa/60 hover:border-guava/50"
+                  ? "border-guava bg-guava-deep text-cream"
+                  : "border-cocoa/20 text-cocoa/70 hover:border-guava/50"
               }`}
             >
               {v.size}

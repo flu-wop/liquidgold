@@ -23,14 +23,14 @@ export default function Price({
       <span
         className={clsx(
           "font-semibold",
-          size === "lg" ? "text-2xl text-cocoa" : "text-guava"
+          size === "lg" ? "text-2xl text-cocoa" : "text-guava-deep"
         )}
       >
         {formatPrice(price)}
       </span>
       {onSale && (
         <>
-          <span className={clsx("text-cocoa/40 line-through", size === "lg" ? "text-lg" : "text-sm")}>
+          <span className={clsx("text-cocoa/70 line-through", size === "lg" ? "text-lg" : "text-sm")}>
             <span className="sr-only">Regular price </span>
             {formatPrice(compareAt)}
           </span>

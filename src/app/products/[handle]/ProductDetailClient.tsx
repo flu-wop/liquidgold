@@ -110,7 +110,7 @@ export default function ProductDetailClient({
       </div>
       <div>
         {scent && (
-          <p className="text-xs font-semibold uppercase tracking-widest text-guava">
+          <p className="text-xs font-semibold uppercase tracking-widest text-guava-deep">
             {scent.name} · {scent.mood}
           </p>
         )}
@@ -128,7 +128,7 @@ export default function ProductDetailClient({
               className={`min-h-[40px] rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
                 type === t
                   ? "border-cocoa bg-cocoa text-cream"
-                  : "border-cocoa/20 text-cocoa/60 hover:border-cocoa/50"
+                  : "border-cocoa/20 text-cocoa/70 hover:border-cocoa/50"
               }`}
             >
               {t}
@@ -144,8 +144,8 @@ export default function ProductDetailClient({
                 aria-pressed={size === v.size}
                 className={`min-h-[40px] rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
                   size === v.size
-                    ? "border-guava bg-guava text-cream"
-                    : "border-cocoa/20 text-cocoa/60 hover:border-guava/50"
+                    ? "border-guava bg-guava-deep text-cream"
+                    : "border-cocoa/20 text-cocoa/70 hover:border-guava/50"
                 }`}
               >
                 {v.size}
@@ -159,7 +159,7 @@ export default function ProductDetailClient({
 
         {active.includes && active.includes.length > 0 && (
           <div className="mt-5">
-            <p className="text-xs font-semibold uppercase tracking-widest text-cocoa/60">
+            <p className="text-xs font-semibold uppercase tracking-widest text-cocoa/70">
               What&rsquo;s inside
             </p>
             <ul className="mt-2 space-y-1.5 text-sm text-cocoa/80">
@@ -174,10 +174,10 @@ export default function ProductDetailClient({
         )}
 
         {scent && scent.notes.length > 0 && (
-          <p className="mt-4 text-sm text-cocoa/60">Notes: {scent.notes.join(" · ")}</p>
+          <p className="mt-4 text-sm text-cocoa/70">Notes: {scent.notes.join(" · ")}</p>
         )}
         {scent && scent.notes.length === 0 && (
-          <p className="mt-4 text-sm italic text-cocoa/40">Fragrance notes coming soon</p>
+          <p className="mt-4 text-sm italic text-cocoa/70">Fragrance notes coming soon</p>
         )}
 
         <div className="mt-8 flex flex-wrap gap-3 sm:gap-4">
@@ -198,7 +198,7 @@ export default function ProductDetailClient({
             {active.ingredients.length > 0 ? (
               <p className="mt-1">{active.ingredients.join(", ")}</p>
             ) : (
-              <p className="mt-1 italic text-cocoa/50">Full ingredient list coming soon</p>
+              <p className="mt-1 italic text-cocoa/70">Full ingredient list coming soon</p>
             )}
           </div>
         </div>

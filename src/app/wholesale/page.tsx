@@ -1,5 +1,10 @@
 import WholesaleForm from "./WholesaleForm";
 
+export const metadata = {
+  title: "Wholesale",
+  description: "Partner with Liquid Gold Skin Co. — wholesale pricing, marketing assets and priority on new scent launches.",
+};
+
 export default function WholesalePage() {
   return (
     <section className="mx-auto max-w-4xl px-6 py-20">
@@ -20,7 +25,7 @@ export default function WholesalePage() {
         ].map((b) => (
           <div key={b.title}>
             <p className="font-display text-xl text-cocoa">{b.title}</p>
-            <p className="mt-2 text-sm text-cocoa/60">{b.desc}</p>
+            <p className="mt-2 text-sm text-cocoa/70">{b.desc}</p>
           </div>
         ))}
       </div>
@@ -28,7 +33,7 @@ export default function WholesalePage() {
       <WholesaleForm />
 
       {/* PLACEHOLDER: link to real catalog PDF once she confirms it exists */}
-      <p className="mt-8 text-sm text-cocoa/60">
+      <p className="mt-8 text-sm text-cocoa/70">
         Prefer a PDF? [Wholesale catalog download — pending]
       </p>
     </section>

@@ -1,3 +1,8 @@
+export const metadata = {
+  title: "Privacy Policy",
+  description: "How Liquid Gold Skin Co. collects, uses and protects your information.",
+};
+
 export default function PrivacyPage() {
   return (
     <section className="mx-auto max-w-2xl px-6 py-20">
@@ -43,7 +48,7 @@ export default function PrivacyPage() {
           <p className="font-semibold text-cocoa">Questions or deletion requests</p>
           <p className="mt-1">
             Email{" "}
-            <a href="mailto:liquidgoldskinco@gmail.com" className="text-guava underline underline-offset-2">
+            <a href="mailto:liquidgoldskinco@gmail.com" className="text-guava-deep underline underline-offset-2">
               liquidgoldskinco@gmail.com
             </a>
             .

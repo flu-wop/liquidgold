@@ -108,7 +108,7 @@ export default function BestSellersCategories({ categories }: { categories: Cate
               <div className="pt-10 md:pt-14">
                 <div className="mb-8 flex flex-col gap-3 border-t border-cocoa/15 pt-8 sm:flex-row sm:items-end sm:justify-between">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.25em] text-guava">Choose your scent</p>
+                    <p className="text-xs font-semibold uppercase tracking-[0.25em] text-guava-deep">Choose your scent</p>
                     <h3 className="mt-2 font-display text-3xl leading-none text-cocoa md:text-4xl">{open.label}</h3>
                     <p className="mt-2 max-w-md text-sm text-cocoa/70">{open.blurb}</p>
                   </div>

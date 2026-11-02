@@ -34,7 +34,7 @@ export default function ShopByMood({ hiddenSlugs }: { hiddenSlugs: Set<string> }
                   {m}
                 </span>
                 <span className="flex items-center gap-4">
-                  <span className="font-body text-xs uppercase tracking-widest text-cocoa/60 transition-colors group-hover:text-cocoa sm:text-sm">
+                  <span className="font-body text-xs uppercase tracking-widest text-cocoa/70 transition-colors group-hover:text-cocoa sm:text-sm">
                     {scent?.name ?? "Explore"} &rarr;
                   </span>
                   {scent && (

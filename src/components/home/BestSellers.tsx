@@ -45,7 +45,7 @@ export default async function BestSellers({ hiddenSlugs }: { hiddenSlugs: Set<st
     <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 md:py-28">
       <Reveal className="mb-8 flex items-end justify-between gap-6 md:mb-12">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-guava">Most loved</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-guava-deep">Most loved</p>
           <h2 className="mt-3 font-display text-4xl leading-[0.95] text-cocoa md:text-6xl">
             Best <span className="text-gold-gradient italic">sellers</span>
           </h2>
