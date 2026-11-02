@@ -12,16 +12,18 @@ import Button from "@/components/ui/Button";
 // - muted + playsInline so iOS/Android allow inline autoplay.
 // - Reduced-motion users get the poster and a play button instead of
 //   autoplay; everyone gets a visible pause/play control (WCAG 2.2.2).
-// Footage: a ~20s cut of Ariel's own video. Portrait = center 9:16 crop
-// (608x1080), landscape = original 16:9 (1280x720); both silent H.264.
+// Footage: an 18.4s montage cut from four 4K iPhone clips (Cocoa Cashmere
+// jar close-up, at the lake, on the rocks, flower-and-jar finish) with 0.4s
+// crossfades and a seamless loop. Portrait = per-shot 9:16 crop of the 4K
+// source, scaled to 720x1280; landscape = 16:9 at 1280x720. Both silent H.264.
 const SOURCES = {
   portrait: {
-    src: "/video/liquid-gold-ritual-portrait.mp4",
-    poster: "/video/liquid-gold-ritual-poster-portrait.jpg",
+    src: "/video/liquid-gold-ritual-v2-portrait.mp4",
+    poster: "/video/liquid-gold-ritual-v2-poster-portrait.jpg",
   },
   landscape: {
-    src: "/video/liquid-gold-ritual-landscape.mp4",
-    poster: "/video/liquid-gold-ritual-poster-landscape.jpg",
+    src: "/video/liquid-gold-ritual-v2-landscape.mp4",
+    poster: "/video/liquid-gold-ritual-v2-poster-landscape.jpg",
   },
 };
 
